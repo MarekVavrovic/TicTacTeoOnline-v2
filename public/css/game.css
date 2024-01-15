@@ -1,0 +1,372 @@
+@import url("https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap");
+
+*,
+::after,
+::before {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.9)),
+    url("../assets/bcg.jpg");
+}
+input,
+label {
+  display: block;
+}
+
+ul {
+	list-style: none;
+}
+
+a {
+	text-decoration: none;
+}
+
+.main {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.container {
+  --s: 10px; /* control the size */
+  padding: var(--s);
+  border: calc(2 * var(--s)) solid #0000;
+  outline: 1px solid #238ec8;
+  outline-offset: calc(-1 * var(--s));
+  background-image: linear-gradient(131.83deg, #7fa0b5 0%, #d3e6f5 99.21%);
+  border-radius: 16px;
+  box-shadow: rgba(13, 110, 180, 0.76) 0px 42px 70px 4px;
+}
+
+.board {
+  display: grid;
+  grid-gap: 1px;
+
+}
+
+.cell {
+  width: 50px;
+  height: 50px;
+  font-size: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #111213;
+  cursor: pointer;
+  font-family: "Black Ops One", cursive;
+}
+
+/* Define colors for players */
+.playerX {
+  color: red;
+}
+
+.playerO {
+  color: blue;
+}
+
+@keyframes opacityAnimation {
+  0%   { opacity: 0; }
+  25%  { opacity: 0.25; }
+  50%  { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.dropdownContainer {
+  display: none; /*flex , none*/
+  color: #238ec8;
+  font-family: "Black Ops One", cursive;
+  text-align: center;
+  --s: 10px; /* control the size */
+  border: calc(2 * var(--s)) solid #0000;
+  outline-offset: calc(-1 * var(--s));
+  opacity: 0
+}
+
+.animate-opacity {
+  animation-name: opacityAnimation;
+  animation-duration: 1s;
+  animation-fill-mode: forwards; 
+  display: flex;
+}
+
+.dropdown #boardSizeSelect {
+  background-color: #689aaf;
+  color: #fff;
+  font-family: "Black Ops One", cursive;
+  padding: 0.5em;
+  padding-right: 1em;
+  border: 0;
+  margin: 1rem;
+  border-radius: 5px;
+  text-indent: 0.01px;
+  text-overflow: "  ";
+  outline: 0;
+}
+
+.dropdown-2 #boardWinSelect {
+  background-color: #689aaf;
+  color: #fff;
+  font-family: "Black Ops One", cursive;
+  padding: 0.5em;
+  padding-right: 2.5em;
+  border: 0;
+  margin: 1rem;
+  border-radius: 5px;
+  text-indent: 0.01px;
+  text-overflow: "  ";
+  outline: 0;
+}
+.dropdownLabel {
+  color: #244e60;
+}
+
+/* Modal styles */
+.score {
+  color: #238ec8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+}
+
+#modalText {
+  font-size: 12px;
+}
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(73, 166, 233, 0.5);
+  display: grid;
+  place-items: center;
+  visibility: hidden;
+  z-index: -10;
+  background: url("../assets/modal-bc.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.modal-content {
+  font-family: "Black Ops One", cursive;
+
+  background-color: #e0e1e9;
+  border-radius: 15px;
+  width: 80vw;
+  height: 20vh;
+  max-width: 420px;
+  text-align: center;
+  display: grid;
+  place-items: center;
+  position: relative;
+  border: 5px solid #238ec8;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+    rgba(0, 0, 0, 0.5) 0px 30px 60px -30px,
+    rgba(10, 37, 64, 0.55) 0px -2px 6px 0px inset;
+}
+
+/*close modal button*/
+.close-button img {
+  position: absolute;
+  top: 10px; 
+  right: 10px;
+  cursor: pointer;
+  width: 2rem;
+}
+
+
+
+#close {
+  width: 35px;
+  background-color: #238ec8;
+  border-radius: 15px;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -280px; /* Initially hidden */
+  width: 280px;
+  height: 100%;
+  background-color: #fff; 
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  transition: left 2s ease; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  z-index: 10; 
+}
+
+#leave-btn{
+  color: #fff; 
+}
+.btn-reset {
+  padding: 10px 20px;
+  margin-top: 20px;
+  background-color: #e74c3c; 
+  color: #fff; 
+  font-family: "Black Ops One", cursive;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-reset:hover {
+  background-color: #c0392b; 
+}
+
+/* Side bar open*/
+.menu {
+ color: #238ec8;
+   font-size: 40px;
+  width: 50px;
+  height: 50px;
+  border: 3px solid whitesmoke;
+  cursor: pointer; 
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  border-radius: 15px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+    rgba(0, 0, 0, 0.3) 0px 30px 60px -30px,
+    rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+}
+
+.boardSettings{
+  
+  top: 80px;
+  right: 10px;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column; 
+  align-items: flex-start; 
+  margin: 20px; 
+  visibility: hidden;
+}
+
+.button-container.buttonContainer-open {
+  visibility: visible;
+}
+
+/* Sidebar Heading Styles */
+.sidebar {
+  background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.7)),
+    url("../assets/sidebar-bcg.png");
+  background-color: #238ec8;
+}
+.sidebar h2 {
+  font-family: "Black Ops One", cursive;
+
+  margin-top: 15px;
+  margin-bottom: 15px;
+  color: #ccc;
+}
+
+/* Input Styles - Labels*/
+.sidebar label {
+  font-family: "Black Ops One", cursive;
+  text-align: left;
+  margin-top: 30px;
+  color: #ccc;
+}
+
+label,
+input {
+  font-family: "Black Ops One", cursive;
+  display: block;
+  width: 100%;
+  border: none;
+  outline: none;
+  box-sizing: border-box;
+}
+
+label {
+  margin-bottom: 5px;
+}
+
+label:nth-of-type(2) {
+  margin-top: 20px;
+}
+
+input::-webkit-input-placeholder {
+  color: gray;
+}
+
+input::-moz-placeholder {
+  color: gray;
+}
+
+input:-ms-input-placeholder {
+  color: gray;
+}
+
+input::-ms-input-placeholder {
+  color: gray;
+}
+
+input::placeholder {
+  color: gray;
+}
+
+input {
+  background: #ecf0f3;
+  padding: 10px;
+  padding-left: 20px;
+  height: 50px;
+  font-size: 14px;
+  border-radius: 60px;
+  box-shadow: rgba(0, 0, 0, 0.09) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px,
+    rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px,
+    rgba(0, 0, 0, 0.09) 0px 32px 16px;
+}
+
+.sidebar input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc; 
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+/* Sidebar Open Class */
+.sidebar.open {
+  left: 0; /* Display sidebar when open */
+}
+
+@media screen and (min-width: 480px) {
+  .score {
+    font-size: 16px;
+  }
+  #modalText {
+    font-size: 17px;
+  }
+  .dropdownContainer {
+    outline: 1px solid #191a1a;
+    margin-bottom: 2rem;
+    background-image: linear-gradient(131.83deg, #7fa0b5 0%, #d3e6f5 99.21%);
+    border-radius: 16px;
+  }
+  .dropdownLabel {
+    color: #3e6e82;
+  }
+
+  #soldOutModal .modal-content #soldOutText {
+    font-size: 20px;
+  }
+}

@@ -1,18 +1,18 @@
 const users = [];
 
 function userJoinChat(id, username, room) {
-  // Check if the user already exists in the room
   const existingUser = users.find(
-    (user) => user.id === id && user.room === room
+    (user) => user.room === room && user.id === id
   );
 
   if (existingUser) {
-    // Return the existing user
     return existingUser;
   }
 
-  // Create a new user and add them to the room
-  const user = { id, username, room, symbol: "" };
+  const userCountInRoom = users.filter((user) => user.room === room).length;
+  const symbol = userCountInRoom === 0 ? "X" : "O";
+
+  const user = { id, username, room, symbol };
   users.push(user);
   return user;
 }

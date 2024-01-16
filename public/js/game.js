@@ -3,7 +3,6 @@ const winSound = document.getElementById("winSound");
 const clickSound = document.getElementById("clickSound");
 const sidebarSound = document.getElementById("sidebarSound");
 
-
 const modalText = document.getElementById("modalText");
 const closeModal = document.getElementById("closeModal");
 
@@ -29,7 +28,7 @@ const chatBoxHeader = chatBox.querySelector(".chat-box-toggle");
 
 //const roomName = document.getElementById("room");
 import { outputRoomName, outputMessage } from "../utils/chat.js";
-import { showModal,hideModal,playSound } from "../utils/gameFunctions.js";
+import { showModal, hideModal, playSound } from "../utils/gameFunctions.js";
 const socket = io();
 
 //CHAT STARTS
@@ -39,10 +38,13 @@ const { username, room } = Qs.parse(location.search, {
 });
 
 //1.2 emit querystring
-socket.emit(`joinRoom`, {
+socket.emit("joinRoom", {
   username,
   room,
+  boardSize: parseInt(boardSizeSelect.value),
+  boardWin: parseInt(boardWinSelect.value),
 });
+
 //1.3 Output room and users on DOM
 socket.on("roomUsers", ({ room, users }) => {
   outputRoomName(room);
@@ -92,7 +94,6 @@ chatForm.addEventListener("submit", (event) => {
   event.target.elements.msg.focus();
 });
 
-
 socket.on("roomFull", ({ room, usersInRoom }) => {
   // Redirect with query parameters
   const encodedRoom = encodeURIComponent(room);
@@ -101,9 +102,7 @@ socket.on("roomFull", ({ room, usersInRoom }) => {
   window.location.href = redirectUrl;
 });
 
-
 //CHAT END
-
 
 // Global variables to store player names
 let playerXName = "Player X";
@@ -123,12 +122,10 @@ function updatePlayerNames(users) {
   }
 }
 
-
 let boardWin = parseInt(boardWinSelect.value);
 let boardSize = parseInt(boardSizeSelect.value);
 
 let currentPlayer = "X";
-
 
 let board = new Array(boardSize)
   .fill(null)
@@ -155,71 +152,38 @@ function handleCellClick(event) {
   const col = parseInt(event.target.dataset.col);
 
   if (board[row][col] === null) {
-    event.target.textContent = currentPlayer;
-    board[row][col] = currentPlayer;
-    playSound(clickSound);
+    // Send move to server instead of handling it locally
+    socket.emit("playerMove", { room, row, col });
+  }
+}
 
-    event.target.classList.remove(`player${currentPlayer}`);
-
-    if (checkWin(row, col)) {
-      // Display the winner
-      displayWinner(currentPlayer === "X" ? playerXName : playerOName);
-    } else if (checkDraw()) {
+socket.on("gameStateUpdate", (gameState) => {
+  // Update the board based on gameState
+  updateBoard(gameState.board);
+  currentPlayer = gameState.currentPlayer; 
+  // Handle display of winner or draw
+  if (gameState.isGameOver) {
+    if (gameState.winner) {
+      displayWinner(gameState.winner === "X" ? playerXName : playerOName);
+    } else {
+      // Handle draw scenario
       modalText.textContent = "It's a draw!";
       showModal();
-      resetGame();
-    } else {
-      // Switch to the next player
-      currentPlayer = currentPlayer === "X" ? "O" : "X";
-      // Add the new current player's class to the cell
-      event.target.classList.add(`player${currentPlayer}`);
+    }
+  }
+});
+
+function updateBoard(board) {
+  for (let row = 0; row < board.length; row++) {
+    for (let col = 0; col < board[row].length; col++) {
+      const cell = boardElement.querySelector(
+        `[data-row="${row}"][data-col="${col}"]`
+      );
+      cell.textContent = board[row][col];
     }
   }
 }
 
-
-//CheckWin
-function checkWin(row, col) {
-  const symbol = board[row][col];
-
-  // Define direction vectors for checking different directions
-  const directions = [
-    [1, 0], // Check right
-    [0, 1], // Check down
-    [1, 1], // Check diagonal (down-right)
-    [-1, 1], // Check diagonal (up-right)
-  ];
-
-  for (const [dx, dy] of directions) {
-    let count = 1; // Count the consecutive symbols in the current direction
-
-    // Check in both directions (forward and backward)
-    for (let dir = -1; dir <= 1; dir += 2) {
-      for (let step = 1; step < boardWin; step++) {
-        const newRow = row + dir * step * dy;
-        const newCol = col + dir * step * dx;
-
-        if (
-          newRow >= 0 &&
-          newRow < boardSize &&
-          newCol >= 0 &&
-          newCol < boardSize &&
-          board[newRow][newCol] === symbol
-        ) {
-          count++;
-        } else {
-          break; // Stop counting if the sequence is broken
-        }
-      }
-
-      if (count === boardWin) {
-        return true; // Found a winning sequence
-      }
-    }
-  }
-
-  return false; // No winning sequence found
-}
 
 // Display player names when a player wins
 let playerXScore = 0;
@@ -245,16 +209,7 @@ function displayWinner(player) {
   resetGame();
 }
 
-function checkDraw() {
-  for (let row = 0; row < boardSize; row++) {
-    for (let col = 0; col < boardSize; col++) {
-      if (board[row][col] === null) {
-        return false;
-      }
-    }
-  }
-  return true;
-}
+
 
 function resetGame() {
   board = new Array(boardSize)
@@ -263,6 +218,7 @@ function resetGame() {
   currentPlayer = "X";
   boardElement.innerHTML = "";
   createBoard();
+    socket.emit("resetGame", { room });
 }
 
 //Game Score, Probability outcome
@@ -297,12 +253,22 @@ clearBoard.addEventListener("click", () => {
 //Reset board size
 boardSizeSelect.addEventListener("change", function () {
   boardSize = parseInt(this.value);
+  socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
   resetGame();
 });
 
 //Reset match logic
 boardWinSelect.addEventListener("change", function () {
   boardWin = parseInt(this.value);
+  socket.emit("boardSettingsChanged", {room, boardSize, boardWin });
+  resetGame();
+});
+
+socket.on("boardSettingsUpdated", ({ newBoardSize, newBoardWin }) => {
+  boardSize = newBoardSize;
+  boardWin = newBoardWin;
+  boardSizeSelect.value = newBoardSize;
+  boardWinSelect.value = newBoardWin;
   resetGame();
 });
 

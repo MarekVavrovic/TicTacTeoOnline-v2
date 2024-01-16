@@ -18,7 +18,8 @@ const clearBoard = document.getElementById("clearBoard");
 const toggleSidebarButton = document.getElementById("toggleSidebar");
 const sidebar = document.getElementById("sidebar");
 const resetScoreButton = document.getElementById("resetScoreButton");
-
+const playerXNameInput = document.getElementById("playerXName");
+const playerONameInput = document.getElementById("playerOName");
 //Chat
 const chatForm = document.getElementById("chat-form");
 const chatMessages = document.querySelector(".chat-messages");
@@ -31,7 +32,7 @@ import { outputRoomName, outputMessage } from "../utils/chat.js";
 import { showModal,hideModal,playSound } from "../utils/gameFunctions.js";
 const socket = io();
 
-//CHAT START
+//CHAT STARTS
 // 1.1 get username and room from the querystring
 const { username, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
@@ -45,6 +46,7 @@ socket.emit(`joinRoom`, {
 //1.3 Output room and users on DOM
 socket.on("roomUsers", ({ room, users }) => {
   outputRoomName(room);
+  updatePlayerNames(users);
 });
 
 //chat listeners
@@ -84,52 +86,43 @@ chatForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const msg = event.target.elements.msg.value;
 
-  //emitting input value to the server
+  //emitting chat-input to the server
   socket.emit("chatMessage", msg);
   event.target.elements.msg.value = "";
   event.target.elements.msg.focus();
 });
 
-// Handle 'roomFull' event
-socket.on("roomFull", ({ room, usersInRoom }) => {
-  console.log("roomFull event received");
-  console.log("room:", room);
-  console.log("users in room:", usersInRoom.join(", "));
 
+socket.on("roomFull", ({ room, usersInRoom }) => {
   // Redirect with query parameters
   const encodedRoom = encodeURIComponent(room);
   const encodedUsers = encodeURIComponent(usersInRoom.join(", "));
   const redirectUrl = `roomNotFound.html?room=${encodedRoom}&users=${encodedUsers}`;
-  
-    window.location.href = redirectUrl;
-
+  window.location.href = redirectUrl;
 });
 
 
 //CHAT END
 
-// Player names input elements
-const playerXNameInput = document.getElementById("playerXName");
-const playerONameInput = document.getElementById("playerOName");
 
-// Initialize player names from local storage or set default names
-let playerXName = localStorage.getItem("playerXName") || "Player X";
-let playerOName = localStorage.getItem("playerOName") || "Player O";
+// Global variables to store player names
+let playerXName = "Player X";
+let playerOName = "Player O";
 
-// Initialize the input fields with the current player names
-playerXNameInput.value = playerXName;
-playerONameInput.value = playerOName;
+function updatePlayerNames(users) {
+  if (users.length > 0) {
+    playerXName = users[0].username; // Set Player X name
+    playerXNameInput.value = playerXName;
+    if (users.length > 1) {
+      playerOName = users[1].username; // Set Player O name
+      playerONameInput.value = playerOName;
+    }
+  } else {
+    playerXNameInput.value = "Waiting for player X";
+    playerONameInput.value = "Waiting for player O";
+  }
+}
 
-// Update player names in local storage when input values change
-playerXNameInput.addEventListener("input", () => {
-  playerXName = playerXNameInput.value;
-  localStorage.setItem("playerXName", playerXName);
-});
-
-playerONameInput.addEventListener("input", () => {
-  playerOName = playerONameInput.value;
-  localStorage.setItem("playerOName", playerOName);
-});
 
 let boardWin = parseInt(boardWinSelect.value);
 let boardSize = parseInt(boardSizeSelect.value);

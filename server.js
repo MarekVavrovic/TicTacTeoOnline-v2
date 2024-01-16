@@ -21,9 +21,15 @@ const chatBot = "ChatBot ";
 io.on("connection", (socket) => {
   socket.on("joinRoom", ({ username, room }) => {
     const roomUsers = getRoomUsers(room);
+
     if (roomUsers.length < 2) {
       const user = userJoinChat(socket.id, username, room);
       socket.join(user.room);
+      //users & room info for sidebar inputs
+      io.to(user.room).emit("roomUsers", {
+        room: user.room,
+        users: getRoomUsers(user.room),
+      });
 
       //welcome current user starts
       socket.emit("message", formatMessage(chatBot, " Welcome to the game"));
@@ -34,11 +40,18 @@ io.on("connection", (socket) => {
           formatMessage(chatBot, `${user.username} has join the chat`)
         );
 
-      //users & room info for sidebar inputs
-      io.to(user.room).emit("roomUsers", {
-        room: user.room,
-        users: getRoomUsers(user.room),
+      //chat inputs
+      socket.on("chatMessage", (received) => {
+        const user = getCurrentUser(socket.id);
+        io.to(user.room).emit(
+          "message",
+          formatMessage(user.username, received)
+        );
       });
+
+      //GAME LOGIC START
+
+      //GAME LOGIC END
     } else {
       const usersInRoom = roomUsers.map((user) => user.username);
       socket.emit("roomFull", {
@@ -47,13 +60,7 @@ io.on("connection", (socket) => {
       });
     }
   });
-  //welcome current user ends
-
-  //chat inputs
-  socket.on("chatMessage", (received) => {
-    const user = getCurrentUser(socket.id);
-    io.to(user.room).emit("message", formatMessage(user.username, received));
-  });
+  
 
   socket.on("disconnect", () => {
     const user = userLeftChat(socket.id);

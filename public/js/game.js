@@ -3,7 +3,7 @@ const winSound = document.getElementById("winSound");
 const clickSound = document.getElementById("clickSound");
 const sidebarSound = document.getElementById("sidebarSound");
 
-const modal = document.getElementById("myModal");
+
 const modalText = document.getElementById("modalText");
 const closeModal = document.getElementById("closeModal");
 
@@ -28,6 +28,7 @@ const chatBoxHeader = chatBox.querySelector(".chat-box-toggle");
 
 //const roomName = document.getElementById("room");
 import { outputRoomName, outputMessage } from "../utils/chat.js";
+import { showModal,hideModal,playSound } from "../utils/gameFunctions.js";
 const socket = io();
 
 //CHAT START
@@ -47,7 +48,6 @@ socket.on("roomUsers", ({ room, users }) => {
 });
 
 //chat listeners
-
 socket.on("message", (message) => {
   outputMessage(message);
   if (!chatIsOpen) {
@@ -90,6 +90,22 @@ chatForm.addEventListener("submit", (event) => {
   event.target.elements.msg.focus();
 });
 
+// Handle 'roomFull' event
+socket.on("roomFull", ({ room, usersInRoom }) => {
+  console.log("roomFull event received");
+  console.log("room:", room);
+  console.log("users in room:", usersInRoom.join(", "));
+
+  // Redirect with query parameters
+  const encodedRoom = encodeURIComponent(room);
+  const encodedUsers = encodeURIComponent(usersInRoom.join(", "));
+  const redirectUrl = `roomNotFound.html?room=${encodedRoom}&users=${encodedUsers}`;
+  
+    window.location.href = redirectUrl;
+
+});
+
+
 //CHAT END
 
 // Player names input elements
@@ -120,22 +136,6 @@ let boardSize = parseInt(boardSizeSelect.value);
 
 let currentPlayer = "X";
 
-//color coding for players
-function makeMove(cell) {
-  if (!cell.textContent) {
-    // Check if the cell is empty
-    cell.textContent = currentPlayer;
-
-    // Change text color based on the current player
-    if (currentPlayer === "X") {
-      cell.style.color = "red";
-      currentPlayer = "O"; // Switch to the next player
-    } else if (currentPlayer === "O") {
-      cell.style.color = "blue";
-      currentPlayer = "X";
-    }
-  }
-}
 
 let board = new Array(boardSize)
   .fill(null)
@@ -184,19 +184,6 @@ function handleCellClick(event) {
   }
 }
 
-function showModal() {
-  modal.style.visibility = "visible";
-  modal.style.zIndex = 10;
-}
-
-function hideModal() {
-  modal.style.visibility = "hidden";
-}
-
-function playSound(soundElement) {
-  soundElement.currentTime = 0;
-  soundElement.play();
-}
 
 //CheckWin
 function checkWin(row, col) {

@@ -14,32 +14,38 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
-// Static folder
 app.use(express.static(path.join(__dirname, "public")));
 
 const chatBot = "ChatBot ";
 
-
-// Socket.IO listeners for connection events
 io.on("connection", (socket) => {
- socket.on("joinRoom", ({ username, room }) => {
-    const user = userJoinChat(socket.id, username, room);
-    socket.join(user.room);
+  socket.on("joinRoom", ({ username, room }) => {
+    const roomUsers = getRoomUsers(room);
+    if (roomUsers.length < 2) {
+      const user = userJoinChat(socket.id, username, room);
+      socket.join(user.room);
 
-    //welcome current user starts
-    socket.emit("message", formatMessage(chatBot, " Welcome to the game"));
-    socket.broadcast
-      .to(user.room)
-      .emit(
-        "message",
-        formatMessage(chatBot, `${user.username} has join the chat`)
-      );
+      //welcome current user starts
+      socket.emit("message", formatMessage(chatBot, " Welcome to the game"));
+      socket.broadcast
+        .to(user.room)
+        .emit(
+          "message",
+          formatMessage(chatBot, `${user.username} has join the chat`)
+        );
 
       //users & room info for sidebar inputs
-      io.to(user.room).emit("roomUsers",{
+      io.to(user.room).emit("roomUsers", {
         room: user.room,
-        users: getRoomUsers(user.room)
-      })
+        users: getRoomUsers(user.room),
+      });
+    } else {
+      const usersInRoom = roomUsers.map((user) => user.username);
+      socket.emit("roomFull", {
+        room: room,
+        usersInRoom: usersInRoom,
+      });
+    }
   });
   //welcome current user ends
 
@@ -52,7 +58,6 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     const user = userLeftChat(socket.id);
 
-    // if block on disconnect
     if (user) {
       io.emit(
         "message",
@@ -65,7 +70,6 @@ io.on("connection", (socket) => {
         users: getRoomUsers(user.room),
       });
     }
-
   });
 });
 

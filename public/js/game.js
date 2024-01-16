@@ -141,15 +141,29 @@ function createBoard() {
       cell.className = "cell";
       cell.dataset.row = row;
       cell.dataset.col = col;
-      cell.addEventListener("click", handleCellClick);
+      cell.addEventListener("click", handleCellClick); // Attach event listener
       boardElement.appendChild(cell);
     }
   }
 }
 
+
 function handleCellClick(event) {
   const row = parseInt(event.target.dataset.row);
   const col = parseInt(event.target.dataset.col);
+
+  // Check if row and col are within valid ranges
+  if (
+    isNaN(row) ||
+    isNaN(col) ||
+    row < 0 ||
+    row >= board.length ||
+    col < 0 ||
+    col >= board[row].length
+  ) {
+    console.error("Invalid row or col values");
+    return;
+  }
 
   if (board[row][col] === null) {
     // Send move to server instead of handling it locally
@@ -157,10 +171,11 @@ function handleCellClick(event) {
   }
 }
 
+
 socket.on("gameStateUpdate", (gameState) => {
   // Update the board based on gameState
   updateBoard(gameState.board);
-  currentPlayer = gameState.currentPlayer; 
+  currentPlayer = gameState.currentPlayer;
   // Handle display of winner or draw
   if (gameState.isGameOver) {
     if (gameState.winner) {
@@ -174,15 +189,37 @@ socket.on("gameStateUpdate", (gameState) => {
 });
 
 function updateBoard(board) {
-  for (let row = 0; row < board.length; row++) {
-    for (let col = 0; col < board[row].length; col++) {
-      const cell = boardElement.querySelector(
-        `[data-row="${row}"][data-col="${col}"]`
-      );
-      cell.textContent = board[row][col];
+  try {
+    if (!board || !Array.isArray(board)) {
+      throw new Error("Invalid board data");
     }
+
+    // Clear the existing board content
+    boardElement.innerHTML = "";
+    boardElement.style.gridTemplateColumns = `repeat(${board.length}, 50px)`;
+
+    for (let row = 0; row < board.length; row++) {
+      if (!Array.isArray(board[row])) {
+        throw new Error(`Invalid row data at index ${row}`);
+      }
+      for (let col = 0; col < board[row].length; col++) {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.dataset.row = row;
+        cell.dataset.col = col;
+
+        // Set the cell's text content based on the board data
+        cell.textContent = board[row][col];
+
+        cell.addEventListener("click", handleCellClick);
+        boardElement.appendChild(cell);
+      }
+    }
+  } catch (error) {
+    console.error(error.message);
   }
 }
+
 
 
 // Display player names when a player wins
@@ -196,6 +233,7 @@ function displayWinner(player) {
   resetGame();
   if (player === playerXName) {
     playerXScore++;
+    boardSizeSelect;
   } else if (player === playerOName) {
     playerOScore++;
   }
@@ -209,8 +247,6 @@ function displayWinner(player) {
   resetGame();
 }
 
-
-
 function resetGame() {
   board = new Array(boardSize)
     .fill(null)
@@ -218,7 +254,7 @@ function resetGame() {
   currentPlayer = "X";
   boardElement.innerHTML = "";
   createBoard();
-    socket.emit("resetGame", { room });
+  socket.emit("resetGame", { room });
 }
 
 //Game Score, Probability outcome
@@ -251,18 +287,51 @@ clearBoard.addEventListener("click", () => {
 });
 
 //Reset board size
-boardSizeSelect.addEventListener("change", function () {
-  boardSize = parseInt(this.value);
-  socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
-  resetGame();
-});
+    // boardSizeSelect.addEventListener("change", function () {
+    //   const selectedBoardSize = parseInt(boardSizeSelect.value);
+    //   console.log(`Selected board size: ${selectedBoardSize}`);
+    //   boardSize = parseInt(this.value);
+    //   socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
+    //   resetGame();
+    // });
 
 //Reset match logic
-boardWinSelect.addEventListener("change", function () {
-  boardWin = parseInt(this.value);
-  socket.emit("boardSettingsChanged", {room, boardSize, boardWin });
-  resetGame();
+    // boardWinSelect.addEventListener("change", function () {
+    //   const selectedWinSize = parseInt(boardWinSelect.value);
+    //   console.log(`Selected winning match size: ${selectedWinSize}`);
+    //   boardWin = parseInt(this.value);
+    //   socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
+    //   resetGame();
+    // });
+
+document.addEventListener("DOMContentLoaded", function () {
+  const boardSizeSelect = document.getElementById("boardSizeSelect");
+  const boardWinSelect = document.getElementById("boardWinSelect");
+
+  let boardSize = parseInt(boardSizeSelect.value);
+  let boardWin = parseInt(boardWinSelect.value);
+
+  // Event listener for "Board Size" dropdown
+  boardSizeSelect.addEventListener("change", function () {
+    const selectedBoardSize = parseInt(boardSizeSelect.value); // Get the selected board size
+    console.log(`Selected board size: ${selectedBoardSize}`);
+    boardSize = selectedBoardSize;
+    socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
+    resetGame();
+  });
+
+  // Event listener for "Match" dropdown
+  boardWinSelect.addEventListener("change", function () {
+    const selectedWinSize = parseInt(boardWinSelect.value);
+    console.log(`Selected winning match size: ${selectedWinSize}`);
+    boardWin = selectedWinSize;
+    socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
+    resetGame();
+  });
 });
+
+
+
 
 socket.on("boardSettingsUpdated", ({ newBoardSize, newBoardWin }) => {
   boardSize = newBoardSize;

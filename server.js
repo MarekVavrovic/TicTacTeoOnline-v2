@@ -106,6 +106,7 @@ io.on("connection", (socket) => {
       const user = userJoinChat(socket.id, username, room);
       socket.join(user.room);
       getGameState(room, boardSize, boardWin);
+      socket.emit("boardSettingsChanged", { boardSize });
       //users & room info for sidebar inputs
       io.to(user.room).emit("roomUsers", {
         room: user.room,
@@ -143,7 +144,7 @@ io.on("connection", (socket) => {
         gameState.winner = null;
         gameState.isGameOver = false;
 
-        io.to(room).emit("boardSettingsUpdated", gameState);
+        // io.to(room).emit("boardSettingsChanged", { boardSize });
       });
 
       socket.on("playerMove", ({ room, row, col }) => {

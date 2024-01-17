@@ -77,7 +77,7 @@ function checkDraw(board) {
   // A draw occurs if there are no empty spaces left on the board
   for (let row of board) {
     if (row.some((cell) => cell === null)) {
-      return false; // Found an empty cell, so not a draw
+      return false; // Found an empty cell
     }
   }
   return true; // No empty spaces, game is a draw
@@ -97,6 +97,9 @@ function resetGameState(room) {
 app.use(express.static(path.join(__dirname, "public")));
 
 const chatBot = "ChatBot ";
+// Initialize player scores
+let playerXScore = 0;
+let playerOScore = 0;
 
 io.on("connection", (socket) => {
   socket.on("joinRoom", ({ username, room, boardSize, boardWin }) => {
@@ -143,8 +146,6 @@ io.on("connection", (socket) => {
         gameState.currentPlayer = "X";
         gameState.winner = null;
         gameState.isGameOver = false;
-
-        // io.to(room).emit("boardSettingsChanged", { boardSize });
       });
 
       socket.on("playerMove", ({ room, row, col }) => {
@@ -182,6 +183,15 @@ io.on("connection", (socket) => {
         const gameState = getGameState(room);
         io.to(room).emit("gameStateUpdate", gameState);
       });
+
+      socket.on("resetScore", () => {
+        const user = getCurrentUser(socket.id);
+        if (user) {
+          // Emit resetScore event to all clients
+          io.to(user.room).emit("resetScore");
+        }
+      });
+
       //GAME LOGIC END
     } else {
       const usersInRoom = roomUsers.map((user) => user.username);
@@ -202,11 +212,19 @@ io.on("connection", (socket) => {
         gameState.isGameOver = true; // Optionally, mark the game as over
         io.to(user.room).emit("gameStateUpdate", gameState);
       }
+
       // Notify other users in the room
       io.to(user.room).emit(
         "message",
         formatMessage(chatBot, `${user.username} has left the game`)
       );
+
+      // Leave room button
+      socket.on("resetGame", ({ room }) => {
+        resetGameState(room);
+        const gameState = getGameState(room);
+        io.to(room).emit("gameStateUpdate", gameState);
+      });
     }
   });
 });

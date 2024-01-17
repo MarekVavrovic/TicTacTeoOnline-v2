@@ -110,10 +110,10 @@ let playerOName = "Player O";
 
 function updatePlayerNames(users) {
   if (users.length > 0) {
-    playerXName = users[0].username; // Set Player X name
+    playerXName = users[0].username;
     playerXNameInput.value = playerXName;
     if (users.length > 1) {
-      playerOName = users[1].username; // Set Player O name
+      playerOName = users[1].username; 
       playerONameInput.value = playerOName;
     }
   } else {
@@ -152,7 +152,7 @@ function handleCellClick(event) {
   const row = parseInt(event.target.dataset.row);
   const col = parseInt(event.target.dataset.col);
 
-  // Check if row and col are within valid ranges
+  // Check if row and col are within valid ranges - delete this if block at the end
   if (
     isNaN(row) ||
     isNaN(col) ||
@@ -171,7 +171,6 @@ function handleCellClick(event) {
   }
 }
 
-
 socket.on("gameStateUpdate", (gameState) => {
   // Update the board based on gameState
   updateBoard(gameState.board);
@@ -188,6 +187,7 @@ socket.on("gameStateUpdate", (gameState) => {
   }
 });
 
+//try to remove try catch block
 function updateBoard(board) {
   try {
     if (!board || !Array.isArray(board)) {
@@ -206,11 +206,8 @@ function updateBoard(board) {
         const cell = document.createElement("div");
         cell.className = "cell";
         cell.dataset.row = row;
-        cell.dataset.col = col;
-
-        // Set the cell's text content based on the board data
+        cell.dataset.col = col;        
         cell.textContent = board[row][col];
-
         cell.addEventListener("click", handleCellClick);
         boardElement.appendChild(cell);
       }
@@ -219,8 +216,6 @@ function updateBoard(board) {
     console.error(error.message);
   }
 }
-
-
 
 // Display player names when a player wins
 let playerXScore = 0;
@@ -286,24 +281,6 @@ clearBoard.addEventListener("click", () => {
   resetGame();
 });
 
-//Reset board size
-    // boardSizeSelect.addEventListener("change", function () {
-    //   const selectedBoardSize = parseInt(boardSizeSelect.value);
-    //   console.log(`Selected board size: ${selectedBoardSize}`);
-    //   boardSize = parseInt(this.value);
-    //   socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
-    //   resetGame();
-    // });
-
-//Reset match logic
-    // boardWinSelect.addEventListener("change", function () {
-    //   const selectedWinSize = parseInt(boardWinSelect.value);
-    //   console.log(`Selected winning match size: ${selectedWinSize}`);
-    //   boardWin = parseInt(this.value);
-    //   socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
-    //   resetGame();
-    // });
-
 document.addEventListener("DOMContentLoaded", function () {
   const boardSizeSelect = document.getElementById("boardSizeSelect");
   const boardWinSelect = document.getElementById("boardWinSelect");
@@ -330,9 +307,6 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-
-
-
 socket.on("boardSettingsUpdated", ({ newBoardSize, newBoardWin }) => {
   boardSize = newBoardSize;
   boardWin = newBoardWin;
@@ -343,15 +317,32 @@ socket.on("boardSettingsUpdated", ({ newBoardSize, newBoardWin }) => {
 
 closeModal.addEventListener("click", hideModal);
 
+
+socket.on("resetScore", () => {
+  // Reset local scores
+  playerXScore = 0;
+  playerOScore = 0;
+
+  // Update UI with new scores
+ const probabilityText = calculateWinProbability(playerXScore, playerOScore);
+
+ modalText.innerHTML = `<div><span class="score">Score:</span> ${playerXName}  ( ${playerXScore} - ${playerOScore} )  ${playerOName}</div><div><span class="score">Probability Of Winning:</span></div><div>${probabilityText}</div>`;
+ showModal();
+});
+
 resetScoreButton.addEventListener("click", function () {
+  socket.emit("resetScore");
+  console.log(`resetScoreButton clicked`);
   playSound(sidebarSound);
   sidebar.classList.toggle("open");
   showModal();
   playerXScore = 0;
   playerOScore = 0;
 
-  modalText.innerHTML = `<div style="font-size: 15px;><span class="score"  "></span> ${playerXName}: ${playerXScore}:${playerOScore}: ${playerOName} </div>`;
+  modalText.innerHTML = `<div style="font-size: 15px;"><span class="score"></span> ${playerXName}: ${playerXScore} ${playerOName}: ${playerOScore}</div>`;
   showModal();
+
 });
+
 
 createBoard();

@@ -243,14 +243,35 @@ function displayWinner(player) {
 }
 
 function resetGame() {
+  socket.emit("resetGame", { room });
   board = new Array(boardSize)
     .fill(null)
     .map(() => new Array(boardSize).fill(null));
   currentPlayer = "X";
   boardElement.innerHTML = "";
   createBoard();
-  socket.emit("resetGame", { room });
+  boardSizeSelect.value = boardSize;
+  boardWinSelect.value = boardWin;
 }
+
+//if one of the players leave the room
+socket.on("resetGame", () => {
+  // Reset local scores
+  playerXScore = 0;
+  playerOScore = 0;
+
+  // Reset board size and winning match length to default values
+  boardSize = 5; // Default board size (5x5)
+  boardWin = 3; // Default match length (3)
+
+  // Update UI elements
+  boardSizeSelect.value = boardSize;
+  boardWinSelect.value = boardWin;
+
+  // Reset the board and update scores and probabilities
+  createBoard();
+  calculateWinProbability();
+});
 
 //Game Score, Probability outcome
 function calculateWinProbability(playerXScore, playerOScore) {
@@ -289,13 +310,13 @@ document.addEventListener("DOMContentLoaded", function () {
   let boardWin = parseInt(boardWinSelect.value);
 
   // Event listener for "Board Size" dropdown
-  boardSizeSelect.addEventListener("change", function () {
-    const selectedBoardSize = parseInt(boardSizeSelect.value); // Get the selected board size
-    console.log(`Selected board size: ${selectedBoardSize}`);
-    boardSize = selectedBoardSize;
-    socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
-    resetGame();
-  });
+ boardSizeSelect.addEventListener("change", function () {
+   const selectedBoardSize = parseInt(boardSizeSelect.value);
+   console.log(`Selected board size: ${selectedBoardSize}`);
+   boardSize = selectedBoardSize;
+   socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
+   resetGame();
+ });
 
   // Event listener for "Match" dropdown
   boardWinSelect.addEventListener("change", function () {
@@ -305,6 +326,7 @@ document.addEventListener("DOMContentLoaded", function () {
     socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
     resetGame();
   });
+
 });
 
 socket.on("boardSettingsUpdated", ({ newBoardSize, newBoardWin }) => {
@@ -314,6 +336,7 @@ socket.on("boardSettingsUpdated", ({ newBoardSize, newBoardWin }) => {
   boardWinSelect.value = newBoardWin;
   resetGame();
 });
+
 
 closeModal.addEventListener("click", hideModal);
 

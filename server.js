@@ -16,6 +16,7 @@ const io = socketIO(server);
 
 //game state
 const games = {};
+
 function createGameState(room, boardSize, boardWin) {
   return {
     board: Array(boardSize)
@@ -28,6 +29,7 @@ function createGameState(room, boardSize, boardWin) {
     isGameOver: false,
   };
 }
+
 
 function getGameState(room, boardSize, boardWin) {
   if (!games[room]) {
@@ -47,28 +49,47 @@ function checkWin(board, playerSymbol, boardWin) {
     for (let j = 0; j < size; j++) {
       if (board[i][j] === playerSymbol) {
         rowWin++;
+      } else {
+        rowWin = 0;
       }
+
       if (board[j][i] === playerSymbol) {
         colWin++;
+      } else {
+        colWin = 0;
       }
-    }
 
-    if (rowWin === boardWin || colWin === boardWin) return true;
+      if (rowWin === boardWin || colWin === boardWin) return true;
+    }
   }
 
   // Check diagonals
-  let diag1Win = 0;
-  let diag2Win = 0;
   for (let i = 0; i < size; i++) {
-    if (board[i][i] === playerSymbol) {
-      diag1Win++;
-    }
-    if (board[i][size - 1 - i] === playerSymbol) {
-      diag2Win++;
+    for (let j = 0; j < size; j++) {
+      let diag1Win = 0;
+      let diag2Win = 0;
+
+      for (let k = 0; k < boardWin; k++) {
+        if (
+          i + k < size &&
+          j + k < size &&
+          board[i + k][j + k] === playerSymbol
+        ) {
+          diag1Win++;
+        }
+
+        if (
+          i + k < size &&
+          j - k >= 0 &&
+          board[i + k][j - k] === playerSymbol
+        ) {
+          diag2Win++;
+        }
+
+        if (diag1Win === boardWin || diag2Win === boardWin) return true;
+      }
     }
   }
-
-  if (diag1Win === boardWin || diag2Win === boardWin) return true;
 
   return false; // No win found
 }
@@ -82,6 +103,7 @@ function checkDraw(board) {
   }
   return true; // No empty spaces, game is a draw
 }
+
 
 function resetGameState(room) {
   if (games[room]) {
@@ -97,9 +119,6 @@ function resetGameState(room) {
 app.use(express.static(path.join(__dirname, "public")));
 
 const chatBot = "ChatBot ";
-// Initialize player scores
-let playerXScore = 0;
-let playerOScore = 0;
 
 io.on("connection", (socket) => {
   socket.on("joinRoom", ({ username, room, boardSize, boardWin }) => {
@@ -146,7 +165,12 @@ io.on("connection", (socket) => {
         gameState.currentPlayer = "X";
         gameState.winner = null;
         gameState.isGameOver = false;
+        io.to(room).emit("boardSettingsUpdated", {
+          newBoardSize: boardSize,
+          newBoardWin: boardWin,
+        });
       });
+
 
       socket.on("playerMove", ({ room, row, col }) => {
         const user = getCurrentUser(socket.id);

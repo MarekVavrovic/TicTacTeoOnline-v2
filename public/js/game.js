@@ -243,6 +243,7 @@ function displayWinner(player) {
 }
 
 function resetGame() {
+   console.log(`resetGame on in resetGame function - this works`);
   socket.emit("resetGame", { room });
   board = new Array(boardSize)
     .fill(null)
@@ -254,35 +255,28 @@ function resetGame() {
   boardWinSelect.value = boardWin;
 }
 
-//if one of the players leave the room
-socket.on("resetGame", () => {
-  // Reset local scores
-  playerXScore = 0;
-  playerOScore = 0;
 
-  // Reset board size and winning match length to default values
-  boardSize = 5; // Default board size (5x5)
-  boardWin = 3; // Default match length (3)
-
-  // Update UI elements
-  boardSizeSelect.value = boardSize;
-  boardWinSelect.value = boardWin;
-
-  // Reset the board and update scores and probabilities
-  createBoard();
-  calculateWinProbability();
-});
-
+// Initialize probability variables to 50%
+let probabilityX = 50;
+let probabilityO = 50;
 //Game Score, Probability outcome
 function calculateWinProbability(playerXScore, playerOScore) {
   const totalGames = playerXScore + playerOScore;
-  const probabilityX = (playerXScore / totalGames) * 100;
-  const probabilityO = (playerOScore / totalGames) * 100;
+
+  if (totalGames === 0) {
+    // Initialize to 50% for the first game
+    probabilityX = 50;
+    probabilityO = 50;
+  } else {
+    probabilityX = (playerXScore / totalGames) * 100;
+    probabilityO = (playerOScore / totalGames) * 100;
+  }
 
   return `${playerXName}: ${probabilityX.toFixed(
     0
   )}%, ${playerOName}: ${probabilityO.toFixed(0)}%`;
 }
+
 
 //LISTENERS
 toggleSidebarButton.addEventListener("click", () => {
@@ -340,6 +334,31 @@ socket.on("boardSettingsUpdated", ({ newBoardSize, newBoardWin }) => {
 
 closeModal.addEventListener("click", hideModal);
 
+//on player leaves the room
+socket.on("gameReset", () => {
+  // Reset local scores to zero
+  playerXScore = 0;
+  playerOScore = 0;
+
+  // Reset the game state to its initial values
+  board = new Array(boardSize)
+    .fill(null)
+    .map(() => new Array(boardSize).fill(null));
+  currentPlayer = "X";
+  updateBoard(board);
+
+  // Set the board size and win conditions to default values
+  boardSize = 4; // Change this to your default board size
+  boardWin = 3; // Change this to your default win condition
+
+  // Update the board settings dropdowns to reflect the default values
+  boardSizeSelect.value = boardSize;
+  boardWinSelect.value = boardWin;
+
+  // Emit board settings changes to the server
+  socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
+});
+
 
 socket.on("resetScore", () => {
   // Reset local scores
@@ -353,19 +372,55 @@ socket.on("resetScore", () => {
  showModal();
 });
 
+// resetScoreButton.addEventListener("click", function () {
+//   socket.emit("resetScore");
+//   console.log(`resetScoreButton clicked`);
+//   playSound(sidebarSound);
+//   sidebar.classList.toggle("open");
+//   showModal();
+//   playerXScore = 0;
+//   playerOScore = 0;
+
+//   // Reset the probability variables to 50%
+//   probabilityX = 50;
+//   probabilityO = 50;
+
+//   modalText.innerHTML = `<div style="font-size: 15px;"><span class="score"></span> ${playerXName}: ${playerXScore} ${playerOName}: ${playerOScore}</div>`;
+//   showModal();
+//   resetGame() //testing
+// });
+
+// Reset Score button event listener
 resetScoreButton.addEventListener("click", function () {
   socket.emit("resetScore");
-  console.log(`resetScoreButton clicked`);
   playSound(sidebarSound);
   sidebar.classList.toggle("open");
-  showModal();
-  playerXScore = 0;
-  playerOScore = 0;
-
-  modalText.innerHTML = `<div style="font-size: 15px;"><span class="score"></span> ${playerXName}: ${playerXScore} ${playerOName}: ${playerOScore}</div>`;
-  showModal();
-
 });
 
+// Update the player names and scores when the page loads or when a user joins a room
+function updatePlayerNamesAndScores(users) {
+  if (users.length > 0) {
+    playerXName = users[0].username;
+    playerXNameInput.value = playerXName;
+  
+    if (users.length > 1) {
+      playerOName = users[1].username;
+      playerONameInput.value = playerOName;
+     
+    }
+  } else {
+    playerXNameInput.value = "Waiting for player X";
+    playerONameInput.value = "Waiting for player O";
+  }
+
+  
+}
+
+// ... (Your existing code)
+
+// Call the updatePlayerNamesAndScores function when the page loads
+document.addEventListener("DOMContentLoaded", function () {
+  updatePlayerNamesAndScores([]);
+});
 
 createBoard();

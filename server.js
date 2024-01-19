@@ -114,6 +114,7 @@ function resetGameState(room) {
     games[room].winner = null;
     games[room].isGameOver = false;
   }
+
 }
 
 app.use(express.static(path.join(__dirname, "public")));
@@ -129,6 +130,7 @@ io.on("connection", (socket) => {
       socket.join(user.room);
       getGameState(room, boardSize, boardWin);
       socket.emit("boardSettingsChanged", { boardSize });
+
       //users & room info for sidebar inputs
       io.to(user.room).emit("roomUsers", {
         room: user.room,
@@ -203,6 +205,7 @@ io.on("connection", (socket) => {
       });
 
       socket.on("resetGame", ({ room }) => {
+         console.log(`resetGame on during the game`);
         resetGameState(room);
         const gameState = getGameState(room);
         io.to(room).emit("gameStateUpdate", gameState);
@@ -229,28 +232,51 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     const user = userLeftChat(socket.id);
     if (user) {
-      // Handle the disconnection in the game
-      // For example, you could pause the game or assign a loss to the disconnected player
-      const gameState = getGameState(user.room);
-      if (gameState) {
-        gameState.isGameOver = true; // Optionally, mark the game as over
-        io.to(user.room).emit("gameStateUpdate", gameState);
-      }
-
       // Notify other users in the room
       io.to(user.room).emit(
         "message",
         formatMessage(chatBot, `${user.username} has left the game`)
       );
 
-      // Leave room button
-      socket.on("resetGame", ({ room }) => {
-        resetGameState(room);
-        const gameState = getGameState(room);
-        io.to(room).emit("gameStateUpdate", gameState);
+      // Reset the game state for the room
+      resetGameState(user.room);
+
+      // Remove the player from the sidebar
+      io.to(user.room).emit("roomUsers", {
+        room: user.room,
+        users: getRoomUsers(user.room),
       });
+
+      // Emit a message to let clients know the game has been reset
+      io.to(user.room).emit("gameReset");
+
+      // Handle other actions you might need
     }
   });
+
+  // socket.on("disconnect", () => {
+  //   const user = userLeftChat(socket.id);
+  //   if (user) {
+  //     // Handle the disconnection in the game
+     
+  //     const gameState = getGameState(user.room);
+  //     if (gameState) {
+  //       gameState.isGameOver = true; // Optionally, mark the game as over
+  //       io.to(user.room).emit("gameStateUpdate", gameState);
+  //     }
+
+  //     // Notify other users in the room
+  //     io.to(user.room).emit(
+  //       "message",
+  //       formatMessage(chatBot, `${user.username} has left the game`)
+  //     );
+
+      
+      
+  //   }
+  // });
+
+  
 });
 
 const PORT = 3000;

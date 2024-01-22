@@ -33,7 +33,7 @@ const socket = io();
 
 //CHAT STARTS
 // 1.1 get username and room from the querystring
-const { username, room } = Qs.parse(location.search, {
+const { username, room} = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
 });
 

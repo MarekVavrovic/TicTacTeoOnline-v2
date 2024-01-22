@@ -199,8 +199,8 @@ a {
 /**/
 
 .player-icon {
-  width: 60px; 
-  height: 60px; 
+  width: 30px; 
+  height: 30px; 
   margin-bottom: 10px; /* Add space below the icon */
 }
 
@@ -400,4 +400,10 @@ input {
   #soldOutModal .modal-content #soldOutText {
     font-size: 20px;
   }
+
+  .player-icon {
+  width: 60px; 
+  height: 60px; 
+ 
+}
 }

@@ -113,7 +113,7 @@ function updatePlayerNames(users) {
     playerXName = users[0].username;
     playerXNameInput.value = playerXName;
     if (users.length > 1) {
-      playerOName = users[1].username; 
+      playerOName = users[1].username;
       playerONameInput.value = playerOName;
     }
   } else {
@@ -146,7 +146,6 @@ function createBoard() {
     }
   }
 }
-
 
 function handleCellClick(event) {
   const row = parseInt(event.target.dataset.row);
@@ -181,8 +180,41 @@ socket.on("gameStateUpdate", (gameState) => {
       displayWinner(gameState.winner === "X" ? playerXName : playerOName);
     } else {
       // Handle draw scenario
-      modalText.textContent = "It's a draw!";
+
+      const probabilityText = calculateWinProbability(
+        playerXScore,
+        playerOScore
+      );
+
+      // SVG icon for the player
+      const playerIconSVG = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="player-icon">
+      <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
+    </svg>`;
+
+      // Display the score and probability in the modal
+      modalText.innerHTML = `
+    <div class="winner-card">
+      <h2>It's a draw!</h2>
+      <div class="player-info">
+        <div class="avatar">
+          ${playerIconSVG}
+          <p>${playerXName}</p>
+          <p class="score">${playerXScore}</p>
+        </div>
+        <div class="avatar">
+          ${playerIconSVG}
+          <p>${playerOName}</p>
+          <p class="score">${playerOScore}</p>
+        </div>
+      </div>
+       <div class="probability">
+     <p>Winning probability</p><span class="score"><div class="avatar"> ${playerXName}: 50% </div><div class="avatar"> ${playerOName}: 50%</div> </span>     
+    </div>
+    </div>`;
+
       showModal();
+      resetGame();
     }
   }
 });
@@ -206,7 +238,7 @@ function updateBoard(board) {
         const cell = document.createElement("div");
         cell.className = "cell";
         cell.dataset.row = row;
-        cell.dataset.col = col;        
+        cell.dataset.col = col;
         cell.textContent = board[row][col];
         cell.addEventListener("click", handleCellClick);
         boardElement.appendChild(cell);
@@ -222,28 +254,49 @@ let playerXScore = 0;
 let playerOScore = 0;
 
 function displayWinner(player) {
-  modalText.textContent = player + " wins!";
   showModal();
   playSound(winSound);
   resetGame();
+
   if (player === playerXName) {
     playerXScore++;
     boardSizeSelect;
   } else if (player === playerOName) {
     playerOScore++;
   }
+
   // Calculate win probabilities
   const probabilityText = calculateWinProbability(playerXScore, playerOScore);
 
+  // SVG icon for the player
+  const playerIconSVG = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="player-icon">
+      <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
+    </svg>`;
+
   // Display the score and probability in the modal
-  modalText.innerHTML = `<div><span class="score">Score:</span> ${playerXName}  ( ${playerXScore} - ${playerOScore} )  ${playerOName}</div><div><span class="score">Probability Of Winning:</span></div><div>${probabilityText}</div>`;
-  showModal();
-  playSound(winSound);
-  resetGame();
+  modalText.innerHTML = `
+       <div class="winner-card">
+      <h2>${player} wins!</h2>
+      <div class="player-info">
+        <div class="avatar">
+          ${playerIconSVG}
+          <p>${playerXName}</p>
+          <p class="score">${playerXScore}</p>
+        </div>
+        <div class="avatar">
+          ${playerIconSVG}
+          <p>${playerOName}</p>
+          <p class="score">${playerOScore}</p>
+        </div>
+      </div>
+      <div class="probability">
+     <p>Winning probability</p><span class="score"><div class="avatar"> ${playerXName}: ${probabilityText.playerXProbability}% </div><div class="avatar"> ${playerOName}: ${probabilityText.playerOProbability}%</div> </span>     
+    </div>
+    </div>`;
 }
 
 function resetGame() {
-   console.log(`resetGame on in resetGame function - this works`);
   socket.emit("resetGame", { room });
   board = new Array(boardSize)
     .fill(null)
@@ -255,28 +308,25 @@ function resetGame() {
   boardWinSelect.value = boardWin;
 }
 
-
 // Initialize probability variables to 50%
 let probabilityX = 50;
 let probabilityO = 50;
 //Game Score, Probability outcome
 function calculateWinProbability(playerXScore, playerOScore) {
   const totalGames = playerXScore + playerOScore;
+  let playerXProbability = 0;
+  let playerOProbability = 0;
 
-  if (totalGames === 0) {
-    // Initialize to 50% for the first game
-    probabilityX = 50;
-    probabilityO = 50;
-  } else {
-    probabilityX = (playerXScore / totalGames) * 100;
-    probabilityO = (playerOScore / totalGames) * 100;
+  if (totalGames > 0) {
+    playerXProbability = (playerXScore / totalGames) * 100;
+    playerOProbability = (playerOScore / totalGames) * 100;
   }
 
-  return `${playerXName}: ${probabilityX.toFixed(
-    0
-  )}%, ${playerOName}: ${probabilityO.toFixed(0)}%`;
+  return {
+    playerXProbability: playerXProbability.toFixed(0),
+    playerOProbability: playerOProbability.toFixed(0),
+  };
 }
-
 
 //LISTENERS
 toggleSidebarButton.addEventListener("click", () => {
@@ -284,12 +334,10 @@ toggleSidebarButton.addEventListener("click", () => {
   sidebar.classList.toggle("open");
 });
 
-//open boardSettings
 boardSettings.addEventListener("click", function () {
   dropdownContainer.classList.toggle("animate-opacity");
 });
 
-//Clear board
 clearBoard.addEventListener("click", () => {
   playSound(sidebarSound);
   sidebar.classList.toggle("open");
@@ -303,24 +351,19 @@ document.addEventListener("DOMContentLoaded", function () {
   let boardSize = parseInt(boardSizeSelect.value);
   let boardWin = parseInt(boardWinSelect.value);
 
-  // Event listener for "Board Size" dropdown
- boardSizeSelect.addEventListener("change", function () {
-   const selectedBoardSize = parseInt(boardSizeSelect.value);
-   console.log(`Selected board size: ${selectedBoardSize}`);
-   boardSize = selectedBoardSize;
-   socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
-   resetGame();
- });
-
-  // Event listener for "Match" dropdown
-  boardWinSelect.addEventListener("change", function () {
-    const selectedWinSize = parseInt(boardWinSelect.value);
-    console.log(`Selected winning match size: ${selectedWinSize}`);
-    boardWin = selectedWinSize;
+  boardSizeSelect.addEventListener("change", function () {
+    const selectedBoardSize = parseInt(boardSizeSelect.value);
+    boardSize = selectedBoardSize;
     socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
     resetGame();
   });
 
+  boardWinSelect.addEventListener("change", function () {
+    const selectedWinSize = parseInt(boardWinSelect.value);
+    boardWin = selectedWinSize;
+    socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
+    resetGame();
+  });
 });
 
 socket.on("boardSettingsUpdated", ({ newBoardSize, newBoardWin }) => {
@@ -331,64 +374,67 @@ socket.on("boardSettingsUpdated", ({ newBoardSize, newBoardWin }) => {
   resetGame();
 });
 
-
 closeModal.addEventListener("click", hideModal);
 
 //on player leaves the room
 socket.on("gameReset", () => {
-  // Reset local scores to zero
+  console.log(`gameReset on`);
   playerXScore = 0;
   playerOScore = 0;
 
-  // Reset the game state to its initial values
   board = new Array(boardSize)
     .fill(null)
     .map(() => new Array(boardSize).fill(null));
   currentPlayer = "X";
   updateBoard(board);
 
-  // Set the board size and win conditions to default values
-  boardSize = 4; // Change this to your default board size
-  boardWin = 3; // Change this to your default win condition
+  boardSize = 6;
+  boardWin = 3;
 
-  // Update the board settings dropdowns to reflect the default values
   boardSizeSelect.value = boardSize;
   boardWinSelect.value = boardWin;
 
+  resetGame();
   // Emit board settings changes to the server
   socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
 });
 
-
 socket.on("resetScore", () => {
-  // Reset local scores
   playerXScore = 0;
   playerOScore = 0;
 
-  // Update UI with new scores
- const probabilityText = calculateWinProbability(playerXScore, playerOScore);
+  // Calculate the updated probabilities
+  const probabilityText = calculateWinProbability(playerXScore, playerOScore);
 
- modalText.innerHTML = `<div><span class="score">Score:</span> ${playerXName}  ( ${playerXScore} - ${playerOScore} )  ${playerOName}</div><div><span class="score">Probability Of Winning:</span></div><div>${probabilityText}</div>`;
- showModal();
+  // SVG icon for the player
+  const playerIconSVG = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="player-icon">
+      <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
+    </svg>`;
+
+  // Display the updated scores and probabilities in the modal
+  modalText.innerHTML = `
+    <div class="winner-card">
+      <h2>Scores Reset</h2>
+      <div class="player-info">
+        <div class="avatar">
+          ${playerIconSVG}
+          <p>${playerXName}</p>
+          <p class="score">${playerXScore}</p>
+        </div>
+        <div class="avatar">
+          ${playerIconSVG}
+          <p>${playerOName}</p>
+          <p class="score">${playerOScore}</p>
+        </div>
+      </div>
+       <div class="probability">
+     <p>Winning probability</p><span class="score"><div class="avatar"> ${playerXName}: 50% </div><div class="avatar"> ${playerOName}: 50%</div> </span>     
+    </div>
+    </div>`;
+
+  showModal();
 });
-
-// resetScoreButton.addEventListener("click", function () {
-//   socket.emit("resetScore");
-//   console.log(`resetScoreButton clicked`);
-//   playSound(sidebarSound);
-//   sidebar.classList.toggle("open");
-//   showModal();
-//   playerXScore = 0;
-//   playerOScore = 0;
-
-//   // Reset the probability variables to 50%
-//   probabilityX = 50;
-//   probabilityO = 50;
-
-//   modalText.innerHTML = `<div style="font-size: 15px;"><span class="score"></span> ${playerXName}: ${playerXScore} ${playerOName}: ${playerOScore}</div>`;
-//   showModal();
-//   resetGame() //testing
-// });
 
 // Reset Score button event listener
 resetScoreButton.addEventListener("click", function () {
@@ -402,21 +448,16 @@ function updatePlayerNamesAndScores(users) {
   if (users.length > 0) {
     playerXName = users[0].username;
     playerXNameInput.value = playerXName;
-  
+
     if (users.length > 1) {
       playerOName = users[1].username;
       playerONameInput.value = playerOName;
-     
     }
   } else {
     playerXNameInput.value = "Waiting for player X";
     playerONameInput.value = "Waiting for player O";
   }
-
-  
 }
-
-// ... (Your existing code)
 
 // Call the updatePlayerNamesAndScores function when the page loads
 document.addEventListener("DOMContentLoaded", function () {

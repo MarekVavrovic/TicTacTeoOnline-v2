@@ -17,6 +17,7 @@ const io = socketIO(server);
 //game state
 const games = {};
 
+
 function createGameState(room, boardSize, boardWin) {
   return {
     board: Array(boardSize)
@@ -26,14 +27,14 @@ function createGameState(room, boardSize, boardWin) {
     boardSize: boardSize,
     boardWin: boardWin,
     winner: null,
-    isGameOver: false,
+    isGameOver: false,    
   };
 }
 
 
 function getGameState(room, boardSize, boardWin) {
   if (!games[room]) {
-    games[room] = createGameState(room, boardSize, boardWin);
+    games[room] = createGameState(room, boardSize, boardWin);    
   }
   return games[room];
 }
@@ -104,7 +105,6 @@ function checkDraw(board) {
   return true; // No empty spaces, game is a draw
 }
 
-
 function resetGameState(room) {
   if (games[room]) {
     games[room].board = Array(games[room].boardSize)
@@ -113,9 +113,11 @@ function resetGameState(room) {
     games[room].currentPlayer = "X";
     games[room].winner = null;
     games[room].isGameOver = false;
+   
   }
 
 }
+
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -124,10 +126,11 @@ const chatBot = "ChatBot ";
 io.on("connection", (socket) => {
   socket.on("joinRoom", ({ username, room, boardSize, boardWin }) => {
     const roomUsers = getRoomUsers(room);
-
+    
     if (roomUsers.length < 2) {
       const user = userJoinChat(socket.id, username, room);
       socket.join(user.room);
+
       getGameState(room, boardSize, boardWin);
       socket.emit("boardSettingsChanged", { boardSize });
 
@@ -156,6 +159,9 @@ io.on("connection", (socket) => {
       });
 
       //GAME LOGIC START
+      
+     
+
       //handling win & board size is changed
       socket.on("boardSettingsChanged", ({ room, boardSize, boardWin }) => {
         const gameState = getGameState(room);
@@ -172,7 +178,6 @@ io.on("connection", (socket) => {
           newBoardWin: boardWin,
         });
       });
-
 
       socket.on("playerMove", ({ room, row, col }) => {
         const user = getCurrentUser(socket.id);
@@ -205,7 +210,6 @@ io.on("connection", (socket) => {
       });
 
       socket.on("resetGame", ({ room }) => {
-         console.log(`resetGame on during the game`);
         resetGameState(room);
         const gameState = getGameState(room);
         io.to(room).emit("gameStateUpdate", gameState);
@@ -214,7 +218,6 @@ io.on("connection", (socket) => {
       socket.on("resetScore", () => {
         const user = getCurrentUser(socket.id);
         if (user) {
-          // Emit resetScore event to all clients
           io.to(user.room).emit("resetScore");
         }
       });
@@ -231,8 +234,7 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     const user = userLeftChat(socket.id);
-    if (user) {
-      // Notify other users in the room
+    if (user) {    
       io.to(user.room).emit(
         "message",
         formatMessage(chatBot, `${user.username} has left the game`)
@@ -240,6 +242,7 @@ io.on("connection", (socket) => {
 
       // Reset the game state for the room
       resetGameState(user.room);
+  
 
       // Remove the player from the sidebar
       io.to(user.room).emit("roomUsers", {
@@ -249,32 +252,9 @@ io.on("connection", (socket) => {
 
       // Emit a message to let clients know the game has been reset
       io.to(user.room).emit("gameReset");
-
-      // Handle other actions you might need
+     
     }
   });
-
-  // socket.on("disconnect", () => {
-  //   const user = userLeftChat(socket.id);
-  //   if (user) {
-  //     // Handle the disconnection in the game
-     
-  //     const gameState = getGameState(user.room);
-  //     if (gameState) {
-  //       gameState.isGameOver = true; // Optionally, mark the game as over
-  //       io.to(user.room).emit("gameStateUpdate", gameState);
-  //     }
-
-  //     // Notify other users in the room
-  //     io.to(user.room).emit(
-  //       "message",
-  //       formatMessage(chatBot, `${user.username} has left the game`)
-  //     );
-
-      
-      
-  //   }
-  // });
 
   
 });

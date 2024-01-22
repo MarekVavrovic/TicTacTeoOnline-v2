@@ -34,6 +34,12 @@ a {
   flex-direction: column;
 }
 
+.game-box{
+  position: fixed;
+  top: 10px;
+  color: #238ec8;
+  font-size: 15px;
+}
 .container {
   --s: 10px; /* control the size */
   padding: var(--s);
@@ -158,12 +164,11 @@ a {
 
 .modal-content {
   font-family: "Black Ops One", cursive;
-
   background-color: #e0e1e9;
   border-radius: 15px;
-  width: 80vw;
-  height: 20vh;
-  max-width: 420px;
+  width: 70vw;
+  height: 30vh;
+  max-width: 500px;
   text-align: center;
   display: grid;
   place-items: center;
@@ -189,6 +194,32 @@ a {
   width: 35px;
   background-color: #238ec8;
   border-radius: 15px;
+}
+
+/**/
+
+.player-icon {
+  width: 60px; 
+  height: 60px; 
+  margin-bottom: 10px; /* Add space below the icon */
+}
+
+/* You may want to adjust the .avatar class as well */
+.avatar {
+  text-align: center;
+  margin: 10px;
+}
+
+/* Make sure .player-info is styled to layout the avatars side by side */
+.player-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Style for the probability text */
+.probability p {
+  margin: 0 0;
 }
 
 /* Sidebar Styles */

@@ -37,10 +37,11 @@ const { username, room} = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
 });
 
+const lowercaseRoom = room.toLowerCase();
 //1.2 emit querystring
 socket.emit("joinRoom", {
   username,
-  room,
+  room :lowercaseRoom,
   boardSize: parseInt(boardSizeSelect.value),
   boardWin: parseInt(boardWinSelect.value),
 });
@@ -166,7 +167,7 @@ function handleCellClick(event) {
 
   if (board[row][col] === null) {
     // Send move to server instead of handling it locally
-    socket.emit("playerMove", { room, row, col });
+    socket.emit("playerMove", { room: room.toLowerCase(), row, col });
   }
 }
 

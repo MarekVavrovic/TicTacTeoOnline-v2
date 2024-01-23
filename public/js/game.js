@@ -149,6 +149,7 @@ function createBoard() {
 }
 
 function handleCellClick(event) {
+  console.log(`handleCellClick`);
   const row = parseInt(event.target.dataset.row);
   const col = parseInt(event.target.dataset.col);
 
@@ -166,7 +167,7 @@ function handleCellClick(event) {
   }
 
   if (board[row][col] === null) {
-    // Send move to server instead of handling it locally
+   
     socket.emit("playerMove", { room: room.toLowerCase(), row, col });
   }
 }
@@ -379,7 +380,7 @@ closeModal.addEventListener("click", hideModal);
 
 //on player leaves the room
 socket.on("gameReset", () => {
-  console.log(`gameReset on`);
+  
   playerXScore = 0;
   playerOScore = 0;
 

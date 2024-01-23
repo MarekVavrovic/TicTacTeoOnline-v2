@@ -26,7 +26,7 @@ a {
 .btn-circle {
 	cursor: pointer;
 	padding: 5px 15px;
-	background: var(--light-color);
+	background: #238ec8;
 	color: var(--dark-color-a);
 	border: 0;
 	font-size: 17px;
@@ -37,7 +37,7 @@ a {
   position: fixed;
   bottom: 10px;
   right: 10px;
-  background: #5a5eb9;
+  background: #1f79aa;
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -66,7 +66,7 @@ a {
 }
 
 .chat-box-header {
-  background: #5a5eb9;
+  background: #1f79aa;
   height: 70px;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
@@ -93,7 +93,6 @@ a {
 
 .chat-box-body:after {
   content: "";
-
   opacity: 0.1;
   top: 0;
   left: 0;
@@ -120,7 +119,7 @@ a {
 .chat-messages .message .meta {
 	font-size: 15px;
 	font-weight: bold;
-	color:  #7386ff;
+	color:  #1f79aa;
 	opacity: 0.7;
 	margin-bottom: 7px;
 }

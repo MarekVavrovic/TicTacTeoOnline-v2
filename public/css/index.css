@@ -30,20 +30,27 @@ a {
   border: none;
   border-radius: 4px;
 }
+.btn-circle:hover{
+  background: var(--dark-color-a);
+  color:var(--light-color) ;
+   box-shadow: rgba(0, 0, 0, 0.09) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px,
+    rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px,
+    rgba(0, 0, 0, 0.09) 0px 32px 16px;
+
+}
 /* ENTRY FORM START */
 .join-container {
   color: #fff;
   width: 100%;
   position: absolute;
-  top: 40%; /* position the top edge of the element in the middle of the parent */
-  left: 50%; /* position the left edge of the element in the middle of the parent */
+  top: 40%; 
+  left: 50%; 
   transform: translate(-50%, -50%);
   align-items: center;
-  z-index: 10;
-
+  z-index: 10; 
   width: 300px;
-  margin: auto; /* Centers the form */
-  padding: 20px; /* Adds space inside the container, around the form */
+  margin: auto; 
+  padding: 20px; 
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -80,6 +87,9 @@ a {
   width: 100%;
   border: none;
   border-radius: 4px;
+   box-shadow: rgba(0, 0, 0, 0.09) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px,
+    rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px,
+    rgba(0, 0, 0, 0.09) 0px 32px 16px;
 }
 
 .join-main select {
@@ -300,8 +310,11 @@ a {
 @media screen and (min-width: 480px) {
 .join-container{
     max-width: 500px;
-	margin: 80px auto;
+	  margin: 80px auto;
     width: 100%;
+   padding-block: 150px;
+   
+
 }
 
 }

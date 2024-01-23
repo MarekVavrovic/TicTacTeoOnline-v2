@@ -11,11 +11,11 @@ export function outputMessage(inputMsg) {
   messageDiv.classList.add("message");
   const p = document.createElement("p");
   p.classList.add("meta");
-  p.innerText = inputMsg.username;
+  p.innerText = inputMsg.username + " ";
   p.innerHTML += `<span>${inputMsg.time}</span>`;
   messageDiv.appendChild(p);
   const para = document.createElement("p");
-  para.innerText = inputMsg.text;
+  para.innerText =inputMsg.text ;
   messageDiv.appendChild(para);
   document.querySelector(".chat-messages").appendChild(messageDiv);
 }

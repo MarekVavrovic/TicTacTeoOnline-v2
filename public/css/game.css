@@ -104,7 +104,7 @@ a {
 }
 
 .dropdown #boardSizeSelect {
-  background-color: #689aaf;
+  background-color: #238ec8;
   color: #fff;
   font-family: "Black Ops One", cursive;
   padding: 0.5em;
@@ -118,7 +118,7 @@ a {
 }
 
 .dropdown-2 #boardWinSelect {
-  background-color: #689aaf;
+  background-color: #238ec8;
   color: #fff;
   font-family: "Black Ops One", cursive;
   padding: 0.5em;
@@ -145,6 +145,9 @@ a {
 
 #modalText {
   font-size: 12px;
+    resize: both;
+    overflow:auto;
+    text-wrap: wrap;
 }
 .modal {
   position: fixed;
@@ -173,7 +176,7 @@ a {
   display: grid;
   place-items: center;
   position: relative;
-  border: 5px solid #238ec8;
+  border: 3px solid #238ec8;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
     rgba(0, 0, 0, 0.5) 0px 30px 60px -30px,
     rgba(10, 37, 64, 0.55) 0px -2px 6px 0px inset;
@@ -188,36 +191,34 @@ a {
   width: 2rem;
 }
 
-
-
 #close {
   width: 35px;
   background-color: #238ec8;
   border-radius: 15px;
 }
 
-/**/
+/*modal*/
 
 .player-icon {
   width: 30px; 
   height: 30px; 
-  margin-bottom: 10px; /* Add space below the icon */
+  margin-bottom: 10px; 
 }
 
-/* You may want to adjust the .avatar class as well */
+
 .avatar {
   text-align: center;
   margin: 10px;
+
 }
 
-/* Make sure .player-info is styled to layout the avatars side by side */
 .player-info {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* Style for the probability text */
+
 .probability p {
   margin: 0 0;
 }
@@ -375,17 +376,20 @@ input {
   font-size: 16px;
 }
 
-/* Sidebar Open Class */
+/* Show Sidebar */
 .sidebar.open {
-  left: 0; /* Display sidebar when open */
+  left: 0; 
 }
 
-@media screen and (min-width: 480px) {
+@media screen and (min-width: 576px) {
   .score {
-    font-size: 16px;
+    font-size: 21px;
   }
   #modalText {
     font-size: 17px;
+  }
+  .modal-content{
+    max-width: 50%;
   }
   .dropdownContainer {
     outline: 1px solid #191a1a;
@@ -404,6 +408,13 @@ input {
   .player-icon {
   width: 60px; 
   height: 60px; 
- 
+   color: rgb(60, 58, 58);
+  text-shadow: #A3A3A3 3px 3px 1px;
+    
 }
+.winner-card h2 {
+  color: rgb(27, 26, 26);
+  text-shadow: #A3A3A3 3px 3px 1px;
+}
+
 }

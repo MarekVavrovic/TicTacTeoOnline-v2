@@ -27,6 +27,17 @@
       </header>
       <main class="join-main">
         <form action="game.html" id="joinForm">
+           <div class="form-control">
+            <label for="room">Create a Room</label>
+            <input
+              type="text"
+              name="room"
+              id="room"
+              placeholder="Enter room..."
+              required
+            />
+          </div>
+          
           <div class="form-control">
             <label for="username">Create a Username</label>
             <input
@@ -37,16 +48,7 @@
               required
             />
           </div>
-          <div class="form-control">
-            <label for="room">Create a Room</label>
-            <input
-              type="text"
-              name="room"
-              id="room"
-              placeholder="Enter room..."
-              required
-            />
-          </div>
+         
           <button type="submit" class="btn-circle">Join the Game</button>
         </form>
       </main>

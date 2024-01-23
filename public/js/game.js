@@ -99,7 +99,7 @@ socket.on("roomFull", ({ room, usersInRoom }) => {
   // Redirect with query parameters
   const encodedRoom = encodeURIComponent(room);
   const encodedUsers = encodeURIComponent(usersInRoom.join(", "));
-  const redirectUrl = `roomNotFound.html?room=${encodedRoom}&users=${encodedUsers}`;
+  const redirectUrl = `roomAlreadyExists.html?room=${encodedRoom}&users=${encodedUsers}`;
   window.location.href = redirectUrl;
 });
 
@@ -169,6 +169,7 @@ function handleCellClick(event) {
   if (board[row][col] === null) {
    
     socket.emit("playerMove", { room: room.toLowerCase(), row, col });
+    playSound(clickSound);
   }
 }
 
@@ -182,7 +183,6 @@ socket.on("gameStateUpdate", (gameState) => {
       displayWinner(gameState.winner === "X" ? playerXName : playerOName);
     } else {
       // Handle draw scenario
-
       const probabilityText = calculateWinProbability(
         playerXScore,
         playerOScore
@@ -201,17 +201,23 @@ socket.on("gameStateUpdate", (gameState) => {
       <div class="player-info">
         <div class="avatar">
           ${playerIconSVG}
-          <p>${playerXName}</p>
+          <p>${playerXName.slice(0, 10)}</p>
           <p class="score">${playerXScore}</p>
         </div>
         <div class="avatar">
           ${playerIconSVG}
-          <p>${playerOName}</p>
+          <p>${playerOName.slice(0, 10)}</p>
           <p class="score">${playerOScore}</p>
         </div>
       </div>
        <div class="probability">
-     <p>Winning probability</p><span class="score"><div class="avatar"> ${playerXName}: 50% </div><div class="avatar"> ${playerOName}: 50%</div> </span>     
+     <p>Winning probability</p><span class="score"><div class="avatar"> ${playerXName.slice(
+       0,
+       10
+     )}: 50% </div><div class="avatar"> ${playerOName.slice(
+        0,
+        10
+      )}: 50%</div> </span>     
     </div>
     </div>`;
 
@@ -221,7 +227,7 @@ socket.on("gameStateUpdate", (gameState) => {
   }
 });
 
-//try to remove try catch block
+
 function updateBoard(board) {
   try {
     if (!board || !Array.isArray(board)) {
@@ -283,17 +289,24 @@ function displayWinner(player) {
       <div class="player-info">
         <div class="avatar">
           ${playerIconSVG}
-          <p>${playerXName}</p>
+          <p>${playerXName.slice(0, 10)}</p>
           <p class="score">${playerXScore}</p>
         </div>
         <div class="avatar">
           ${playerIconSVG}
-          <p>${playerOName}</p>
+          <p>${playerOName.slice(0, 10)}</p>
           <p class="score">${playerOScore}</p>
         </div>
       </div>
       <div class="probability">
-     <p>Winning probability</p><span class="score"><div class="avatar"> ${playerXName}: ${probabilityText.playerXProbability}% </div><div class="avatar"> ${playerOName}: ${probabilityText.playerOProbability}%</div> </span>     
+     <p>Winning probability</p><span class="score"><div class="avatar"> ${playerXName.slice(
+       0,
+       10
+     )}: ${
+    probabilityText.playerXProbability
+  }% </div><div class="avatar"> ${playerOName.slice(0, 10)}: ${
+    probabilityText.playerOProbability
+  }%</div> </span>     
     </div>
     </div>`;
 }
@@ -421,17 +434,23 @@ socket.on("resetScore", () => {
       <div class="player-info">
         <div class="avatar">
           ${playerIconSVG}
-          <p>${playerXName}</p>
+          <p>${playerXName.slice(0, 10)}</p>
           <p class="score">${playerXScore}</p>
         </div>
         <div class="avatar">
           ${playerIconSVG}
-          <p>${playerOName}</p>
+          <p>${playerOName.slice(0, 10)}</p>
           <p class="score">${playerOScore}</p>
         </div>
       </div>
        <div class="probability">
-     <p>Winning probability</p><span class="score"><div class="avatar"> ${playerXName}: 50% </div><div class="avatar"> ${playerOName}: 50%</div> </span>     
+     <p>Winning probability</p><span class="score"><div class="avatar"> ${playerXName.slice(
+       0,
+       10
+     )}: 50% </div><div class="avatar"> ${playerOName.slice(
+    0,
+    10
+  )}: 50%</div> </span>     
     </div>
     </div>`;
 

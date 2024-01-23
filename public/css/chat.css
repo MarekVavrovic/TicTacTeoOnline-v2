@@ -1,6 +1,6 @@
 :root {
 	--dark-color-a: #667aff;
-	--dark-color-b: #7386ff;
+	--dark-color-b: rgb(115, 234, 255);
 	--light-color: #e6e9ff;
 	--success-color: #5cb85c;
 	--error-color: #d9534f;
@@ -136,7 +136,7 @@ a {
   padding-top: 10px;
   padding-right: 50px;
   padding-bottom: 10px;
-  padding-left: 15px;
+  padding-left: 10px;
   border: none;
   resize: none;
   outline: none;
@@ -155,7 +155,6 @@ a {
   background: transparent;
   box-shadow: none;
   border: none;
-  border-radius: 50%;
   color: #5a5eb9;
   width: 35px;
   height: 35px;

@@ -1,5 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap");
-
+@import "https://fonts.googleapis.com/css?family=Inconsolata";
 *,
 ::after,
 ::before {
@@ -12,6 +12,7 @@ html,
 body {
   background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.9)),
     url("../assets/bcg.jpg");
+    font-family: "Inconsolata", Helvetica, sans-serif;
 }
 input,
 label {
@@ -145,8 +146,7 @@ a {
 
 #modalText {
   font-size: 12px;
-    resize: both;
-    overflow:auto;
+   
     text-wrap: wrap;
 }
 .modal {
@@ -166,7 +166,7 @@ a {
 }
 
 .modal-content {
-  font-family: "Black Ops One", cursive;
+  font-family: 'Inconsolata', Helvetica, sans-serif;
   background-color: #e0e1e9;
   border-radius: 15px;
   width: 70vw;
@@ -388,9 +388,9 @@ input {
   #modalText {
     font-size: 17px;
   }
-  .modal-content{
+  /* .modal-content{
     max-width: 50%;
-  }
+  } */
   .dropdownContainer {
     outline: 1px solid #191a1a;
     margin-bottom: 2rem;

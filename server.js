@@ -16,7 +16,6 @@ const io = socketIO(server);
 
 app.use(express.static(path.join(__dirname, "public")));
 
-
 //game state
 const games = {};
 
@@ -120,7 +119,6 @@ function resetGameState(room) {
 const chatBot = "ChatBot ";
 
 io.on("connection", (socket) => {
-
   socket.on("joinRoom", ({ username, room, boardSize, boardWin }) => {
     const roomUsers = getRoomUsers(room);
 
@@ -138,7 +136,13 @@ io.on("connection", (socket) => {
       });
 
       //welcome current user starts
-      socket.emit("message", formatMessage(chatBot, " Welcome to the game"));
+      socket.emit(
+        "message",
+        formatMessage(
+          chatBot,
+          " Welcome to the game. If one of the players leaves the room, the room must be destroyed. Otherwise, terrible things will start to happen. Good luck in your game."
+        )
+      );
       socket.broadcast
         .to(user.room)
         .emit(
@@ -172,6 +176,16 @@ io.on("connection", (socket) => {
           newBoardSize: boardSize,
           newBoardWin: boardWin,
         });
+        /** */
+        socket.broadcast
+          .to(user.room)
+          .emit(
+            "message",
+            formatMessage(
+              chatBot,
+              `${user.username} has changed the settings.The board size is set to:${boardSize}. You're playing on ${boardWin} matches. Good Luck!`
+            )
+          );
       });
 
       socket.on("playerMove", ({ room, row, col }) => {
@@ -232,7 +246,10 @@ io.on("connection", (socket) => {
     if (user) {
       io.to(user.room).emit(
         "message",
-        formatMessage(chatBot, `${user.username} has left the game`)
+        formatMessage(
+          chatBot,
+          `${user.username} has left the game. If you want to continue the game with another player or the same one, please create a new room. This will no longer be functional.`
+        )
       );
 
       // Reset the game state for the room

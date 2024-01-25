@@ -453,8 +453,9 @@ socket.on("resetScore", () => {
   )}: 50%</div> </span>     
     </div>
     </div>`;
-
+  resetGame()    
   showModal();
+  clearBoard()
 });
 
 // Reset Score button event listener

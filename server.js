@@ -18,19 +18,21 @@ app.use(express.static(path.join(__dirname, "public")));
 
 //game state
 const games = {};
+let currentPlayerOrder = "X";
 
 function createGameState(room, boardSize, boardWin) {
   return {
     board: Array(boardSize)
       .fill(null)
       .map(() => Array(boardSize).fill(null)),
-    currentPlayer: "X",
+    currentPlayer: currentPlayerOrder, // Set the current player based on the order
     boardSize: boardSize,
     boardWin: boardWin,
     winner: null,
     isGameOver: false,
   };
 }
+
 
 function getGameState(room, boardSize, boardWin) {
   if (!games[room]) {
@@ -110,11 +112,16 @@ function resetGameState(room) {
     games[room].board = Array(games[room].boardSize)
       .fill(null)
       .map(() => Array(games[room].boardSize).fill(null));
-    games[room].currentPlayer = "X";
+
+    // Toggle the current player order
+    currentPlayerOrder = currentPlayerOrder === "X" ? "O" : "X";
+
+    games[room].currentPlayer = currentPlayerOrder;
     games[room].winner = null;
     games[room].isGameOver = false;
   }
 }
+
 
 const chatBot = "ChatBot ";
 

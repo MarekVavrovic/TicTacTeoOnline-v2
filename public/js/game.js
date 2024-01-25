@@ -6,6 +6,7 @@ const sidebarSound = document.getElementById("sidebarSound");
 const modalText = document.getElementById("modalText");
 const closeModal = document.getElementById("closeModal");
 
+const swapPlayersButton = document.getElementById("swapPlayers");
 // const menuButton = document.getElementById("menuButton");
 const boardSettings = document.getElementById("boardSettings");
 const dropdownContainer = document.querySelector(".dropdownContainer");
@@ -127,6 +128,20 @@ let boardWin = parseInt(boardWinSelect.value);
 let boardSize = parseInt(boardSizeSelect.value);
 
 let currentPlayer = "X";
+swapPlayersButton.addEventListener("click", () => {
+  // Send a socket event to the server to indicate a player order change request
+  socket.emit("changePlayerOrder", {});
+});
+
+socket.on("playerOrderChanged", (currentPlayer) => {
+  // Update the current player on the client side
+  currentPlayer = currentPlayer;
+
+  // You can also update the UI to display the current player
+  // Here, you can add code to display the current player if needed
+
+  // ...
+});
 
 let board = new Array(boardSize)
   .fill(null)
@@ -153,7 +168,6 @@ function handleCellClick(event) {
   const row = parseInt(event.target.dataset.row);
   const col = parseInt(event.target.dataset.col);
 
-  // Check if row and col are within valid ranges - delete this if block at the end
   if (
     isNaN(row) ||
     isNaN(col) ||
@@ -167,11 +181,14 @@ function handleCellClick(event) {
   }
 
   if (board[row][col] === null) {
-   
     socket.emit("playerMove", { room: room.toLowerCase(), row, col });
+
+    // Update the current player after a move is made
+    currentPlayer = currentPlayer === "X" ? "O" : "X";
     playSound(clickSound);
   }
 }
+
 
 socket.on("gameStateUpdate", (gameState) => {
   // Update the board based on gameState
@@ -313,15 +330,19 @@ function displayWinner(player) {
 
 function resetGame() {
   socket.emit("resetGame", { room });
+}
+
+socket.on("resetGame", ({ newCurrentPlayer }) => {
+  currentPlayer = newCurrentPlayer;
   board = new Array(boardSize)
     .fill(null)
     .map(() => new Array(boardSize).fill(null));
-  currentPlayer = "X";
   boardElement.innerHTML = "";
   createBoard();
   boardSizeSelect.value = boardSize;
   boardWinSelect.value = boardWin;
-}
+});
+
 
 // Initialize probability variables to 50%
 let probabilityX = 50;
@@ -455,7 +476,7 @@ socket.on("resetScore", () => {
     </div>`;
   resetGame()    
   showModal();
-  clearBoard()
+  
 });
 
 // Reset Score button event listener

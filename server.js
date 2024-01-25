@@ -18,20 +18,22 @@ app.use(express.static(path.join(__dirname, "public")));
 
 //game state
 const games = {};
-let currentPlayerOrder = "X";
+//let currentPlayerOrder = "X";
 
 function createGameState(room, boardSize, boardWin) {
   return {
     board: Array(boardSize)
       .fill(null)
       .map(() => Array(boardSize).fill(null)),
-    currentPlayer: currentPlayerOrder, // Set the current player based on the order
+    currentPlayer: null, // Set the current player to null initially
     boardSize: boardSize,
     boardWin: boardWin,
     winner: null,
     isGameOver: false,
   };
 }
+
+
 
 
 function getGameState(room, boardSize, boardWin) {
@@ -113,14 +115,12 @@ function resetGameState(room) {
       .fill(null)
       .map(() => Array(games[room].boardSize).fill(null));
 
-    // Toggle the current player order
-    currentPlayerOrder = currentPlayerOrder === "X" ? "O" : "X";
-
-    games[room].currentPlayer = currentPlayerOrder;
+    games[room].currentPlayer = games[room].currentPlayer; // Keep the current player as it is
     games[room].winner = null;
     games[room].isGameOver = false;
   }
 }
+
 
 
 const chatBot = "ChatBot ";
@@ -133,7 +133,9 @@ io.on("connection", (socket) => {
       const user = userJoinChat(socket.id, username, room);
       socket.join(user.room);
 
-      getGameState(room, boardSize, boardWin);
+      const gameState = getGameState(room, boardSize, boardWin);
+      gameState.currentPlayer = "X";
+     
       socket.emit("boardSettingsChanged", { boardSize });
 
       //users & room info for sidebar inputs
@@ -167,6 +169,28 @@ io.on("connection", (socket) => {
       });
 
       //GAME LOGIC START
+  
+      socket.on("changePlayerOrder", () => {      
+        const user = getCurrentUser(socket.id);
+        const gameState = getGameState(user.room);
+
+        if (gameState.currentPlayer === "X") {
+          gameState.currentPlayer = "O";
+        } else {
+          gameState.currentPlayer = "X";
+        }
+
+        socket.broadcast
+          .to(user.room)
+          .emit(
+            "message",
+            formatMessage(chatBot, `${user.username} starts the next game`)
+          );
+        
+        io.to(user.room).emit("playerOrderChanged", gameState.currentPlayer);
+
+         
+      });
 
       //handling win & board size is changed
       socket.on("boardSettingsChanged", ({ room, boardSize, boardWin }) => {
@@ -190,9 +214,10 @@ io.on("connection", (socket) => {
             "message",
             formatMessage(
               chatBot,
-              `${user.username} has changed the settings.The board size is set to:${boardSize}. You're playing on ${boardWin} matches. Good Luck!`
+              `${user.username} has changed the settings. You're playing on ${boardWin} matches. Good Luck!`
             )
           );
+
       });
 
       socket.on("playerMove", ({ room, row, col }) => {
@@ -225,11 +250,24 @@ io.on("connection", (socket) => {
         }
       });
 
-      socket.on("resetGame", ({ room }) => {
-        resetGameState(room);
-        const gameState = getGameState(room);
-        io.to(room).emit("gameStateUpdate", gameState);
-      });
+    socket.on("resetGame", ({ room }) => {
+      resetGameState(room);
+      const gameState = getGameState(room);
+      io.to(room).emit("gameStateUpdate", gameState);
+
+      // Determine the next current player based on the number of moves made
+      const xMoves = gameState.board
+        .flat()
+        .filter((cell) => cell === "X").length;
+      const oMoves = gameState.board
+        .flat()
+        .filter((cell) => cell === "O").length;
+      const newCurrentPlayer = xMoves <= oMoves ? "X" : "O";
+
+      // Emit the new current player order to all clients
+      io.to(room).emit("playerOrderChanged", newCurrentPlayer);
+    });
+
 
       socket.on("resetScore", () => {
         const user = getCurrentUser(socket.id);

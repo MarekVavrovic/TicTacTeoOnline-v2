@@ -132,6 +132,7 @@ function resetGameState(room) {
 const chatBot = "ChatBot ";
 
 io.on("connection", (socket) => {
+
   socket.on("joinRoom", ({ username, room, boardSize, boardWin }) => {
     const roomUsers = getRoomUsers(room);
 
@@ -155,7 +156,7 @@ io.on("connection", (socket) => {
         "message",
         formatMessage(
           chatBot,
-          " Welcome to the game. To alternate the order of the players use [Swap Players] button. Good luck in your game."
+          " Welcome to the game. You are playing on 3 matches. To alternate the order of the players use [Swap Players] button. Good luck in your game."
         )
       );
       socket.broadcast
@@ -291,6 +292,8 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     const user = userLeftChat(socket.id);
     if (user) {
+      io.to(user.room).emit("playerLeft", user.username);
+      
       io.to(user.room).emit(
         "message",
         formatMessage(
@@ -312,6 +315,7 @@ io.on("connection", (socket) => {
       io.to(user.room).emit("gameReset");
     }
   });
+
 });
 
 const PORT = 3000;

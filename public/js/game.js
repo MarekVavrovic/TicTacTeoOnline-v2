@@ -26,8 +26,6 @@ const chatMessages = document.querySelector(".chat-messages");
 const chatCircle = document.getElementById("chat-circle");
 const chatBox = document.querySelector(".chat-box");
 const chatBoxHeader = chatBox.querySelector(".chat-box-toggle");
-
-//const roomName = document.getElementById("room");
 import {
   outputRoomName,
   outputMessage,
@@ -348,6 +346,16 @@ function calculateWinProbability(playerXScore, playerOScore) {
     playerOProbability: playerOProbability.toFixed(0),
   };
 }
+
+// Socket.io code to handle the "playerLeft" event
+socket.on("playerLeft", (leftPlayerName) => {
+  if (leftPlayerName === playerXName) {
+    playerXNameInput.value = "Waiting for player X";
+  } else if (leftPlayerName === playerOName) {
+    playerONameInput.value = "Waiting for player O";
+  }
+});
+
 
 //LISTENERS
 toggleSidebarButton.addEventListener("click", () => {

@@ -16,6 +16,7 @@ const boardWinSelect = document.getElementById("boardWinSelect");
 const clearBoard = document.getElementById("clearBoard");
 
 const toggleSidebarButton = document.getElementById("toggleSidebar");
+const toggleSidebarEye = document.getElementById("toggleSidebar-2");
 const sidebar = document.getElementById("sidebar");
 const resetScoreButton = document.getElementById("resetScoreButton");
 const playerXNameInput = document.getElementById("playerXName");
@@ -359,6 +360,11 @@ socket.on("playerLeft", (leftPlayerName) => {
 
 //LISTENERS
 toggleSidebarButton.addEventListener("click", () => {
+  playSound(sidebarSound);
+  sidebar.classList.toggle("open");
+});
+
+toggleSidebarEye.addEventListener("click", () => {
   playSound(sidebarSound);
   sidebar.classList.toggle("open");
 });

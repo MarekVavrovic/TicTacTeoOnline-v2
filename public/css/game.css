@@ -183,13 +183,15 @@ a {
 }
 
 /*close modal button*/
-.close-button img {
+.close-button  {
   position: absolute;
   top: 10px; 
   right: 10px;
   cursor: pointer;
   width: 2rem;
+  color: #0f0000;
 }
+
 
 #close {
   width: 35px;
@@ -260,6 +262,16 @@ a {
 
 .btn-reset:hover {
   background-color: #c0392b; 
+}
+
+/*close sidebar button*/
+.close-button-sidebar {
+  position: absolute;
+  top: 10px; 
+  right: 10px; 
+  cursor: pointer;
+  font-size: 30px;
+  color: #ccc;
 }
 
 .menu {

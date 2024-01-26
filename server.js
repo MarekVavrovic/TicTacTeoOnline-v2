@@ -155,14 +155,14 @@ io.on("connection", (socket) => {
         "message",
         formatMessage(
           chatBot,
-          " Welcome to the game. If one of the players leaves the room, the room must be destroyed. Otherwise, terrible things will start to happen. Good luck in your game."
+          " Welcome to the game. To alternate the order of the players use [Swap Players] button. Good luck in your game."
         )
       );
       socket.broadcast
         .to(user.room)
         .emit(
           "message",
-          formatMessage(chatBot, `${user.username} has join the chat`)
+          formatMessage(chatBot, `${user.username} has join the chat.`)
         );
 
       //chat inputs
@@ -190,7 +190,7 @@ io.on("connection", (socket) => {
           .to(user.room)
           .emit(
             "message",
-            formatMessage(chatBot, `${user.username} starts the next game`)
+            formatMessage(chatBot, `${user.username} starts the next game.`)
           );
 
         io.to(user.room).emit("playerOrderChanged", gameState.currentPlayer);

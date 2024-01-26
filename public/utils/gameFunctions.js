@@ -1,6 +1,5 @@
 const modal = document.getElementById("myModal");
 
-
 export function showModal() {
   modal.style.visibility = "visible";
   modal.style.zIndex = 10;

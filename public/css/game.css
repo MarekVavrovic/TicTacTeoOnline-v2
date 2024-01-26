@@ -135,7 +135,7 @@ a {
   color: #244e60;
 }
 
-/* Modal styles */
+/* Modal*/
 .score {
   color: #238ec8;
   display: flex;
@@ -223,11 +223,11 @@ a {
   margin: 0 0;
 }
 
-/* Sidebar Styles */
+/* Sidebar*/
 .sidebar {
   position: fixed;
   top: 0;
-  left: -280px; /* Initially hidden */
+  left: -280px; 
   width: 280px;
   height: 100%;
   background-color: #fff; 
@@ -244,7 +244,6 @@ a {
   color: #fff; 
 }
 .btn-reset {
-  /* padding: 10px 20px; */
   width: 145px;
   padding: 5px 5px;
   margin-top: 20px;
@@ -262,7 +261,6 @@ a {
   background-color: #c0392b; 
 }
 
-/* Side bar open*/
 .menu {
  color: #238ec8;
    font-size: 40px;
@@ -297,7 +295,6 @@ a {
   visibility: visible;
 }
 
-/* Sidebar Heading Styles */
 .sidebar {
   background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.7)),
     url("../assets/sidebar-bcg.png");
@@ -390,9 +387,7 @@ input {
   #modalText {
     font-size: 17px;
   }
-  /* .modal-content{
-    max-width: 50%;
-  } */
+
   .dropdownContainer {
     outline: 1px solid #191a1a;
     margin-bottom: 2rem;

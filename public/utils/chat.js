@@ -3,7 +3,6 @@ const roomName = document.getElementById("room");
 //1.4
 export function outputRoomName(room) {
   roomName.value = room;
-  // console.log(`roomId:${room}`);
 }
 
 export function outputMessage(inputMsg) {

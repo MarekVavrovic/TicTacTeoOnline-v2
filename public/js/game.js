@@ -131,18 +131,15 @@ let boardSize = parseInt(boardSizeSelect.value);
 
 let currentPlayer = "X";
 swapPlayersButton.addEventListener("click", () => {
-  // Send a socket event to the server to indicate a player order change request
   socket.emit("changePlayerOrder", {});
+  sidebar.classList.toggle("open");
 });
 
 socket.on("playerOrderChanged", (currentPlayer) => {
-  // Update the current player on the client side
   currentPlayer = currentPlayer;
 
-  // You can also update the UI to display the current player
-  // Here, you can add code to display the current player if needed
-
-  // ...
+  //update the UI to display the current player
+  
 });
 
 let board = new Array(boardSize)
@@ -159,14 +156,13 @@ function createBoard() {
       cell.className = "cell";
       cell.dataset.row = row;
       cell.dataset.col = col;
-      cell.addEventListener("click", handleCellClick); // Attach event listener
+      cell.addEventListener("click", handleCellClick); 
       boardElement.appendChild(cell);
     }
   }
 }
 
-function handleCellClick(event) {
-  console.log(`handleCellClick`);
+function handleCellClick(event) {  
   const row = parseInt(event.target.dataset.row);
   const col = parseInt(event.target.dataset.col);
 
@@ -185,7 +181,7 @@ function handleCellClick(event) {
   if (board[row][col] === null) {
     socket.emit("playerMove", { room: room.toLowerCase(), row, col });
 
-    // Update the current player after a move is made
+    // Update the player after a move is made
     currentPlayer = currentPlayer === "X" ? "O" : "X";
     playSound(clickSound);
   }
@@ -193,10 +189,8 @@ function handleCellClick(event) {
 
 
 socket.on("gameStateUpdate", (gameState) => {
-  // Update the board based on gameState
   updateBoard(gameState.board);
   currentPlayer = gameState.currentPlayer;
-  // Handle display of winner or draw
   if (gameState.isGameOver) {
     if (gameState.winner) {
       displayWinner(gameState.winner === "X" ? playerXName : playerOName);
@@ -207,13 +201,11 @@ socket.on("gameStateUpdate", (gameState) => {
         playerOScore
       );
 
-      // SVG icon for the player
       const playerIconSVG = `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="player-icon">
       <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
     </svg>`;
-
-      // Display the score and probability in the modal
+    
       modalText.innerHTML = `
     <div class="winner-card">
       <h2>It's a draw!</h2>
@@ -253,7 +245,6 @@ function updateBoard(board) {
       throw new Error("Invalid board data");
     }
 
-    // Clear the existing board content
     boardElement.innerHTML = "";
     boardElement.style.gridTemplateColumns = `repeat(${board.length}, 50px)`;
 
@@ -276,7 +267,6 @@ function updateBoard(board) {
   }
 }
 
-// Display player names when a player wins
 let playerXScore = 0;
 let playerOScore = 0;
 
@@ -292,16 +282,13 @@ function displayWinner(player) {
     playerOScore++;
   }
 
-  // Calculate win probabilities
   const probabilityText = calculateWinProbability(playerXScore, playerOScore);
 
-  // SVG icon for the player
   const playerIconSVG = `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="player-icon">
       <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
     </svg>`;
 
-  // Display the score and probability in the modal
   modalText.innerHTML = `
        <div class="winner-card">
       <h2>${player} wins!</h2>
@@ -346,10 +333,6 @@ socket.on("resetGame", ({ newCurrentPlayer }) => {
 });
 
 
-// Initialize probability variables to 50%
-let probabilityX = 50;
-let probabilityO = 50;
-//Game Score, Probability outcome
 function calculateWinProbability(playerXScore, playerOScore) {
   const totalGames = playerXScore + playerOScore;
   let playerXProbability = 0;
@@ -433,7 +416,7 @@ socket.on("gameReset", () => {
   boardWinSelect.value = boardWin;
 
   resetGame();
-  // Emit board settings changes to the server
+  // Emit to the server
   socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
 });
 
@@ -441,16 +424,13 @@ socket.on("resetScore", () => {
   playerXScore = 0;
   playerOScore = 0;
 
-  // Calculate the updated probabilities
   const probabilityText = calculateWinProbability(playerXScore, playerOScore);
 
-  // SVG icon for the player
   const playerIconSVG = `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="player-icon">
       <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
     </svg>`;
 
-  // Display the updated scores and probabilities in the modal
   modalText.innerHTML = `
     <div class="winner-card">
       <h2>Scores Reset</h2>
@@ -481,14 +461,12 @@ socket.on("resetScore", () => {
   
 });
 
-// Reset Score button event listener
 resetScoreButton.addEventListener("click", function () {
   socket.emit("resetScore");
   playSound(sidebarSound);
   sidebar.classList.toggle("open");
 });
 
-// Update the player names and scores when the page loads or when a user joins a room
 function updatePlayerNamesAndScores(users) {
   if (users.length > 0) {
     playerXName = users[0].username;
@@ -504,7 +482,7 @@ function updatePlayerNamesAndScores(users) {
   }
 }
 
-// Call the updatePlayerNamesAndScores function when the page loads
+// when the page loads
 document.addEventListener("DOMContentLoaded", function () {
   updatePlayerNamesAndScores([]);
 });

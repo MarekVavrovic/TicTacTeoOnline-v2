@@ -20,3 +20,15 @@ export function outputMessage(inputMsg) {
   document.querySelector(".chat-messages").appendChild(messageDiv);
 }
 
+export function getQueryParams() {
+  const queryParams = {};
+  const queryString = window.location.search.substring(1);
+  const queryParts = queryString.split("&");
+
+  for (const part of queryParts) {
+    const [key, value] = part.split("=");
+    queryParams[key] = decodeURIComponent(value);
+  }
+
+  return queryParams;
+}

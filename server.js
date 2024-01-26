@@ -2,6 +2,10 @@ const path = require("path");
 const http = require("http");
 const express = require("express");
 const socketIO = require("socket.io");
+const helmet = require("helmet");
+const cors = require("cors");
+const xss = require("xss-clean");
+
 const formatMessage = require("./public/utils/messages");
 const {
   userJoinChat,
@@ -14,11 +18,18 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
+//security
+app.use(helmet());
+const corsOptions = {
+  origin: "https://tic-tac-toe-mv.onrender.com",
+  methods: ["GET", "POST"],
+};
+app.use(cors(corsOptions));
+app.use(xss());
+
 app.use(express.static(path.join(__dirname, "public")));
 
-//game state
 const games = {};
-//let currentPlayerOrder = "X";
 
 function createGameState(room, boardSize, boardWin) {
   return {
@@ -32,9 +43,6 @@ function createGameState(room, boardSize, boardWin) {
     isGameOver: false,
   };
 }
-
-
-
 
 function getGameState(room, boardSize, boardWin) {
   if (!games[room]) {
@@ -121,8 +129,6 @@ function resetGameState(room) {
   }
 }
 
-
-
 const chatBot = "ChatBot ";
 
 io.on("connection", (socket) => {
@@ -135,7 +141,7 @@ io.on("connection", (socket) => {
 
       const gameState = getGameState(room, boardSize, boardWin);
       gameState.currentPlayer = "X";
-     
+
       socket.emit("boardSettingsChanged", { boardSize });
 
       //users & room info for sidebar inputs
@@ -169,8 +175,8 @@ io.on("connection", (socket) => {
       });
 
       //GAME LOGIC START
-  
-      socket.on("changePlayerOrder", () => {      
+
+      socket.on("changePlayerOrder", () => {
         const user = getCurrentUser(socket.id);
         const gameState = getGameState(user.room);
 
@@ -186,10 +192,8 @@ io.on("connection", (socket) => {
             "message",
             formatMessage(chatBot, `${user.username} starts the next game`)
           );
-        
-        io.to(user.room).emit("playerOrderChanged", gameState.currentPlayer);
 
-         
+        io.to(user.room).emit("playerOrderChanged", gameState.currentPlayer);
       });
 
       //handling win & board size is changed
@@ -217,7 +221,6 @@ io.on("connection", (socket) => {
               `${user.username} has changed the settings. You're playing on ${boardWin} matches. Good Luck!`
             )
           );
-
       });
 
       socket.on("playerMove", ({ room, row, col }) => {
@@ -250,24 +253,23 @@ io.on("connection", (socket) => {
         }
       });
 
-    socket.on("resetGame", ({ room }) => {
-      resetGameState(room);
-      const gameState = getGameState(room);
-      io.to(room).emit("gameStateUpdate", gameState);
+      socket.on("resetGame", ({ room }) => {
+        resetGameState(room);
+        const gameState = getGameState(room);
+        io.to(room).emit("gameStateUpdate", gameState);
 
-      // Determine the next current player based on the number of moves made
-      const xMoves = gameState.board
-        .flat()
-        .filter((cell) => cell === "X").length;
-      const oMoves = gameState.board
-        .flat()
-        .filter((cell) => cell === "O").length;
-      const newCurrentPlayer = xMoves <= oMoves ? "X" : "O";
+        // Determine the next current player based on the number of moves made
+        const xMoves = gameState.board
+          .flat()
+          .filter((cell) => cell === "X").length;
+        const oMoves = gameState.board
+          .flat()
+          .filter((cell) => cell === "O").length;
+        const newCurrentPlayer = xMoves <= oMoves ? "X" : "O";
 
-      // Emit the new current player order to all clients
-      io.to(room).emit("playerOrderChanged", newCurrentPlayer);
-    });
-
+        // Emit the new current player order to all clients
+        io.to(room).emit("playerOrderChanged", newCurrentPlayer);
+      });
 
       socket.on("resetScore", () => {
         const user = getCurrentUser(socket.id);

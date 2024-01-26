@@ -28,15 +28,17 @@ const chatBox = document.querySelector(".chat-box");
 const chatBoxHeader = chatBox.querySelector(".chat-box-toggle");
 
 //const roomName = document.getElementById("room");
-import { outputRoomName, outputMessage } from "../utils/chat.js";
+import {
+  outputRoomName,
+  outputMessage,
+  getQueryParams,
+} from "../utils/chat.js";
 import { showModal, hideModal, playSound } from "../utils/gameFunctions.js";
 const socket = io();
 
 //CHAT STARTS
 // 1.1 get username and room from the querystring
-const { username, room} = Qs.parse(location.search, {
-  ignoreQueryPrefix: true,
-});
+const { username, room } = getQueryParams();
 
 const lowercaseRoom = room.toLowerCase();
 //1.2 emit querystring

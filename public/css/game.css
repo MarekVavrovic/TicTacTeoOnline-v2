@@ -25,6 +25,7 @@ ul {
 
 a {
 	text-decoration: none;
+  color: #fff
 }
 
 .main {
@@ -243,7 +244,7 @@ a {
 }
 
 #leave-btn{
-  color: #fff; 
+ text-align: center;
 }
 .btn-reset {
   width: 145px;

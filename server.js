@@ -298,7 +298,7 @@ io.on("connection", (socket) => {
         "message",
         formatMessage(
           chatBot,
-          `${user.username} has left the game. If you want to continue the game with another player or the same one, please create a new room. This will no longer be functional.`
+          `${user.username} has left the game. Game will be reset in 5 seconds.`
         )
       );
 

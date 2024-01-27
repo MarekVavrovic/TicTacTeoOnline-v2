@@ -14,3 +14,9 @@ export function playSound(soundElement) {
   soundElement.currentTime = 0;
   soundElement.play();
 }
+
+export function refreshPageWithDelay() {
+  setTimeout(function () {
+    location.reload();
+  }, 5000); 
+}

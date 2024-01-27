@@ -25,8 +25,9 @@ export function getQueryParams() {
   const queryParts = queryString.split("&");
 
   for (const part of queryParts) {
-    const [key, value] = part.split("=");
-    queryParams[key] = decodeURIComponent(value);
+    const [key, encodedValue] = part.split("=");
+    const value = decodeURIComponent(encodedValue.replace(/\+/g, " ")); 
+    queryParams[key] = value;
   }
 
   return queryParams;

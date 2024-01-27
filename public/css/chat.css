@@ -33,6 +33,7 @@ a {
 }
 
 /* CHAT START */
+
 #chat-circle {
   position: fixed;
   bottom: 10px;
@@ -53,7 +54,7 @@ a {
 }
 
 .chat-box {
-  display: inline-block; /*none or block*/
+  display: block; /*none or block*/
   background: #efefef;
   position: fixed;
   right: 10px;
@@ -63,6 +64,19 @@ a {
   max-height: 100vh;
   border-radius: 5px;
   box-shadow: 0px 5px 35px 9px #ccc;
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+.animate-opacity {
+  opacity: 1; 
+}
+
+@keyframes opacityAnimation {
+  0%   { opacity: 0; }
+  25%  { opacity: 0.25; }
+  50%  { opacity: 0.5; }
+  100% { opacity: 1; }
 }
 
 .chat-box-header {

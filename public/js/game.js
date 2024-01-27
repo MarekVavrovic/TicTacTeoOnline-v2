@@ -32,7 +32,12 @@ import {
   outputMessage,
   getQueryParams,
 } from "../utils/chat.js";
-import { showModal, hideModal, playSound } from "../utils/gameFunctions.js";
+import {
+  showModal,
+  hideModal,
+  playSound,
+  refreshPageWithDelay,
+} from "../utils/gameFunctions.js";
 const socket = io();
 
 //CHAT STARTS
@@ -43,7 +48,7 @@ const lowercaseRoom = room.toLowerCase();
 //1.2 emit querystring
 socket.emit("joinRoom", {
   username,
-  room :lowercaseRoom,
+  room: lowercaseRoom,
   boardSize: parseInt(boardSizeSelect.value),
   boardWin: parseInt(boardWinSelect.value),
 });
@@ -68,10 +73,16 @@ let chatIsOpen = false;
 
 function toggleChatBox() {
   if (chatIsOpen) {
-    chatBox.style.display = "none";
+    chatBox.style.opacity = "0"; 
+    setTimeout(() => {
+      chatBox.style.display = "none"; 
+    }, 1000); 
     chatIsOpen = false;
   } else {
     chatBox.style.display = "block";
+    setTimeout(() => {
+      chatBox.style.opacity = "1"; 
+    }, 0); 
     chatIsOpen = true;
   }
 }
@@ -138,7 +149,6 @@ socket.on("playerOrderChanged", (currentPlayer) => {
   currentPlayer = currentPlayer;
 
   //update the UI to display the current player
-  
 });
 
 let board = new Array(boardSize)
@@ -155,13 +165,13 @@ function createBoard() {
       cell.className = "cell";
       cell.dataset.row = row;
       cell.dataset.col = col;
-      cell.addEventListener("click", handleCellClick); 
+      cell.addEventListener("click", handleCellClick);
       boardElement.appendChild(cell);
     }
   }
 }
 
-function handleCellClick(event) {  
+function handleCellClick(event) {
   const row = parseInt(event.target.dataset.row);
   const col = parseInt(event.target.dataset.col);
 
@@ -186,7 +196,6 @@ function handleCellClick(event) {
   }
 }
 
-
 socket.on("gameStateUpdate", (gameState) => {
   updateBoard(gameState.board);
   currentPlayer = gameState.currentPlayer;
@@ -204,7 +213,7 @@ socket.on("gameStateUpdate", (gameState) => {
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="player-icon">
       <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
     </svg>`;
-    
+
       modalText.innerHTML = `
     <div class="winner-card">
       <h2>It's a draw!</h2>
@@ -224,10 +233,11 @@ socket.on("gameStateUpdate", (gameState) => {
      <p>Winning probability</p><span class="score"><div class="avatar"> ${playerXName.slice(
        0,
        10
-     )}: 50% </div><div class="avatar"> ${playerOName.slice(
-        0,
-        10
-      )}: 50%</div> </span>     
+     )}: ${
+        probabilityText.playerXProbability
+      }% </div><div class="avatar"> ${playerOName.slice(0, 10)}: ${
+        probabilityText.playerOProbability
+      }%</div> </span>     
     </div>
     </div>`;
 
@@ -236,7 +246,6 @@ socket.on("gameStateUpdate", (gameState) => {
     }
   }
 });
-
 
 function updateBoard(board) {
   try {
@@ -331,11 +340,10 @@ socket.on("resetGame", ({ newCurrentPlayer }) => {
   boardWinSelect.value = boardWin;
 });
 
-
 function calculateWinProbability(playerXScore, playerOScore) {
   const totalGames = playerXScore + playerOScore;
-  let playerXProbability = 0;
-  let playerOProbability = 0;
+  let playerXProbability = 50;
+  let playerOProbability = 50;
 
   if (totalGames > 0) {
     playerXProbability = (playerXScore / totalGames) * 100;
@@ -352,11 +360,12 @@ function calculateWinProbability(playerXScore, playerOScore) {
 socket.on("playerLeft", (leftPlayerName) => {
   if (leftPlayerName === playerXName) {
     playerXNameInput.value = "Waiting for player X";
+    refreshPageWithDelay();
   } else if (leftPlayerName === playerOName) {
     playerONameInput.value = "Waiting for player O";
+    refreshPageWithDelay();
   }
 });
-
 
 //LISTENERS
 toggleSidebarButton.addEventListener("click", () => {
@@ -413,7 +422,6 @@ closeModal.addEventListener("click", hideModal);
 
 //on player leaves the room
 socket.on("gameReset", () => {
-  
   playerXScore = 0;
   playerOScore = 0;
 
@@ -470,9 +478,8 @@ socket.on("resetScore", () => {
   )}: 50%</div> </span>     
     </div>
     </div>`;
-  resetGame()    
+  resetGame();
   showModal();
-  
 });
 
 resetScoreButton.addEventListener("click", function () {

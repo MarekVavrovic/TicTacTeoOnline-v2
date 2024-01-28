@@ -150,7 +150,7 @@ io.on("connection", (socket) => {
         "message",
         formatMessage(
           chatBot,
-          " Welcome to the game. You are playing on 3 matches. To alternate the order of the players use [Swap Players] button. Good luck in your game."
+          " Welcome to the game. You are playing on 3 matches. Good luck in your game."
         )
       );
       socket.broadcast
@@ -217,53 +217,25 @@ io.on("connection", (socket) => {
           );
       });
 
-      // socket.on("playerMove", ({ room, row, col }) => {
-      //   const user = getCurrentUser(socket.id);
-      //   const gameState = getGameState(room);
-
-      //   if (
-      //     user &&
-      //     gameState.currentPlayer === user.symbol &&
-      //     gameState.board[row][col] === null &&
-      //     !gameState.isGameOver
-      //   ) {
-      //     gameState.board[row][col] = user.symbol;
-
-      //     // Check for win or draw
-      //     if (checkWin(gameState.board, user.symbol, gameState.boardWin)) {
-      //       gameState.winner = user.symbol;
-      //       gameState.isGameOver = true;
-      //     } else if (checkDraw(gameState.board)) {
-      //       gameState.isGameOver = true;
-      //     }
-
-      //     // Switch player if game is not over
-      //     if (!gameState.isGameOver) {
-      //       gameState.currentPlayer =
-      //         gameState.currentPlayer === "X" ? "O" : "X";
-      //     }
-
-      //     io.to(room).emit("gameStateUpdate", gameState);
-      //   }
-      // });
+  
 
       socket.on("playerMove", ({ room, row, col }) => {
         const user = getCurrentUser(socket.id);
         const gameState = getGameState(room);
 
         if (!user || !gameState) {
-          // Handle cases where user or gameState is undefined
+      
           return;
         }
 
         if (
           gameState.currentPlayer !== user.symbol ||
           gameState.isGameOver ||
-          row < 0 || // Check if row is a valid index
-          col < 0 || // Check if col is a valid index
-          row >= gameState.board.length || // Check if row is within bounds
-          col >= gameState.board[row].length || // Check if col is within bounds
-          gameState.board[row][col] !== null // Check if the cell is already filled
+          row < 0 || //  valid index
+          col < 0 || 
+          row >= gameState.board.length || 
+          col >= gameState.board[row].length || 
+          gameState.board[row][col] !== null  
         ) {
           // Handle invalid moves or conditions where the player cannot make a move
           return;

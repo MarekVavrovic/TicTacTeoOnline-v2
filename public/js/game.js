@@ -155,21 +155,6 @@ let board = new Array(boardSize)
   .fill(null)
   .map(() => new Array(boardSize).fill(null));
 
-// function createBoard() {
-//   boardElement.innerHTML = "";
-//   boardElement.style.gridTemplateColumns = `repeat(${boardSize}, 50px)`;
-
-//   for (let row = 0; row < boardSize; row++) {
-//     for (let col = 0; col < boardSize; col++) {
-//       const cell = document.createElement("div");
-//       cell.className = "cell";
-//       cell.dataset.row = row;
-//       cell.dataset.col = col;
-//       cell.addEventListener("click", handleCellClick);
-//       boardElement.appendChild(cell);
-//     }
-//   }
-// }
 
 function createOrResetBoard() {
   boardElement.innerHTML = "";
@@ -345,12 +330,10 @@ function displayWinner(player) {
     </div>`;
 }
 
-// function resetGame() {
-//   socket.emit("resetGame", { room, boardSize, boardWin });
-// }
+
 
 function resetGame() {
-  // currentPlayer = "X";
+
   createOrResetBoard();
   socket.emit("resetGame", { room, boardSize, boardWin });
 }
@@ -414,28 +397,6 @@ clearBoard.addEventListener("click", () => {
   sidebar.classList.toggle("open");
   resetGame();
 });
-
-// document.addEventListener("DOMContentLoaded", function () {
-//   const boardSizeSelect = document.getElementById("boardSizeSelect");
-//   const boardWinSelect = document.getElementById("boardWinSelect");
-
-//   let boardSize = parseInt(boardSizeSelect.value);
-//   let boardWin = parseInt(boardWinSelect.value);
-
-//   boardSizeSelect.addEventListener("change", function () {
-//     const selectedBoardSize = parseInt(boardSizeSelect.value);
-//     boardSize = selectedBoardSize;
-//     socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
-//     resetGame();
-//   });
-
-//   boardWinSelect.addEventListener("change", function () {
-//     const selectedWinSize = parseInt(boardWinSelect.value);
-//     boardWin = selectedWinSize;
-//     socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
-//     resetGame();
-//   });
-// });
 
 // Event listener for board size select
 boardSizeSelect.addEventListener("change", function () {
@@ -553,5 +514,5 @@ document.addEventListener("DOMContentLoaded", function () {
   updatePlayerNamesAndScores([]);
 });
 
-//createBoard();
+
 createOrResetBoard();

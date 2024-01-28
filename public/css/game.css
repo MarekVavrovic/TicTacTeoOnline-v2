@@ -100,6 +100,7 @@ a {
   display: flex;
   transition: opacity 1s;
   margin-top: -8rem;
+  font-size: 12px;
 }
 
 .animate-opacity {
@@ -313,9 +314,9 @@ animation: focus-in-contract 1s linear 0s 1 normal none;
 
 .menu {
  color: #238ec8;
-   font-size: 40px;
-  width: 50px;
-  height: 50px;
+  font-size: 30px;
+  width: 40px;
+  height: 40px;
   border: 3px solid whitesmoke;
   cursor: pointer; 
   position: fixed;
@@ -325,12 +326,13 @@ animation: focus-in-contract 1s linear 0s 1 normal none;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
     rgba(0, 0, 0, 0.3) 0px 30px 60px -30px,
     rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+    box-sizing: border-box;
 }
 
 .boardSettings{
   
-  top: 10px;
-  right: 80px;
+  top: 80px;
+  right: 10px;
 
 }
 
@@ -446,6 +448,7 @@ input {
     margin-bottom: 2rem;
     background-image: linear-gradient(131.83deg, #7fa0b5 0%, #d3e6f5 99.21%);
     border-radius: 16px;
+    font-size: 15px;
   }
   .dropdownLabel {
     color: #3e6e82;
@@ -470,6 +473,13 @@ input {
 .btn-reset{
    padding: 10px 20px; 
    width: 190px;
+}
+
+.menu {
+ 
+  font-size: 40px;
+  width: 50px;
+  height: 50px;
 }
 
 }

@@ -331,7 +331,7 @@ animation: focus-in-contract 1s linear 0s 1 normal none;
 
 .boardSettings{
   
-  top: 80px;
+  top: 60px;
   right: 10px;
 
 }
@@ -449,6 +449,9 @@ input {
     background-image: linear-gradient(131.83deg, #7fa0b5 0%, #d3e6f5 99.21%);
     border-radius: 16px;
     font-size: 15px;
+  }
+  .boardSettings{
+    top:80px;
   }
   .dropdownLabel {
     color: #3e6e82;

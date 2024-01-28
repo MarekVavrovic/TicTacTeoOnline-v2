@@ -360,10 +360,10 @@ function calculateWinProbability(playerXScore, playerOScore) {
 socket.on("playerLeft", (leftPlayerName) => {
   if (leftPlayerName === playerXName) {
     playerXNameInput.value = "Waiting for player X";
-    refreshPageWithDelay();
+   // refreshPageWithDelay();
   } else if (leftPlayerName === playerOName) {
     playerONameInput.value = "Waiting for player O";
-    refreshPageWithDelay();
+    // refreshPageWithDelay();
   }
 });
 

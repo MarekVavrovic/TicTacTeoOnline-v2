@@ -99,7 +99,7 @@ a {
 
 .chat-box-body {
   position: relative;
-  height: 370px;
+  height: 300px;
   height: auto;
   border: 1px solid #ccc;
   overflow: hidden;
@@ -120,7 +120,7 @@ a {
 
 .chat-messages {
   padding: 15px;
-  height: 370px;
+  height: 300px;
   overflow-y: scroll;
 }
 
@@ -174,4 +174,12 @@ a {
   height: 35px;
 }
 
+@media screen and (min-width: 576px) {
+.chat-messages{
+   height: 370px;
+}
+.chat-box-body{
+  height: 370px;
+}
+}
 /* CHAT END */

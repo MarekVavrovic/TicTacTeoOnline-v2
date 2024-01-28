@@ -2,7 +2,7 @@ const path = require("path");
 const http = require("http");
 const express = require("express");
 const socketIO = require("socket.io");
-
+const cors = require("cors");
 const formatMessage = require("./public/utils/messages");
 const {
   userJoinChat,
@@ -14,6 +14,13 @@ const {
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
+
+const corsOptions = {
+  origin: "https://tic-tac-toe-mv.onrender.com",
+  methods: ["GET", "POST"],
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.static(path.join(__dirname, "public")));
 

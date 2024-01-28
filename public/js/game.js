@@ -73,16 +73,16 @@ let chatIsOpen = false;
 
 function toggleChatBox() {
   if (chatIsOpen) {
-    chatBox.style.opacity = "0"; 
+    chatBox.style.opacity = "0";
     setTimeout(() => {
-      chatBox.style.display = "none"; 
-    }, 1000); 
+      chatBox.style.display = "none";
+    }, 1000);
     chatIsOpen = false;
   } else {
     chatBox.style.display = "block";
     setTimeout(() => {
-      chatBox.style.opacity = "1"; 
-    }, 0); 
+      chatBox.style.opacity = "1";
+    }, 0);
     chatIsOpen = true;
   }
 }
@@ -155,9 +155,29 @@ let board = new Array(boardSize)
   .fill(null)
   .map(() => new Array(boardSize).fill(null));
 
-function createBoard() {
+// function createBoard() {
+//   boardElement.innerHTML = "";
+//   boardElement.style.gridTemplateColumns = `repeat(${boardSize}, 50px)`;
+
+//   for (let row = 0; row < boardSize; row++) {
+//     for (let col = 0; col < boardSize; col++) {
+//       const cell = document.createElement("div");
+//       cell.className = "cell";
+//       cell.dataset.row = row;
+//       cell.dataset.col = col;
+//       cell.addEventListener("click", handleCellClick);
+//       boardElement.appendChild(cell);
+//     }
+//   }
+// }
+
+function createOrResetBoard() {
   boardElement.innerHTML = "";
   boardElement.style.gridTemplateColumns = `repeat(${boardSize}, 50px)`;
+
+  board = new Array(boardSize)
+    .fill(null)
+    .map(() => new Array(boardSize).fill(null));
 
   for (let row = 0; row < boardSize; row++) {
     for (let col = 0; col < boardSize; col++) {
@@ -325,17 +345,24 @@ function displayWinner(player) {
     </div>`;
 }
 
+// function resetGame() {
+//   socket.emit("resetGame", { room, boardSize, boardWin });
+// }
+
 function resetGame() {
-  socket.emit("resetGame", { room });
+  // currentPlayer = "X";
+  createOrResetBoard();
+  socket.emit("resetGame", { room, boardSize, boardWin });
 }
 
-socket.on("resetGame", ({ newCurrentPlayer }) => {
+socket.on("resetGame", ({ newCurrentPlayer, boardSize, boardWin }) => {
   currentPlayer = newCurrentPlayer;
   board = new Array(boardSize)
     .fill(null)
     .map(() => new Array(boardSize).fill(null));
   boardElement.innerHTML = "";
-  createBoard();
+  // createBoard();
+  createOrResetBoard();
   boardSizeSelect.value = boardSize;
   boardWinSelect.value = boardWin;
 });
@@ -360,7 +387,7 @@ function calculateWinProbability(playerXScore, playerOScore) {
 socket.on("playerLeft", (leftPlayerName) => {
   if (leftPlayerName === playerXName) {
     playerXNameInput.value = "Waiting for player X";
-   // refreshPageWithDelay();
+    // refreshPageWithDelay();
   } else if (leftPlayerName === playerOName) {
     playerONameInput.value = "Waiting for player O";
     // refreshPageWithDelay();
@@ -388,27 +415,45 @@ clearBoard.addEventListener("click", () => {
   resetGame();
 });
 
-document.addEventListener("DOMContentLoaded", function () {
-  const boardSizeSelect = document.getElementById("boardSizeSelect");
-  const boardWinSelect = document.getElementById("boardWinSelect");
+// document.addEventListener("DOMContentLoaded", function () {
+//   const boardSizeSelect = document.getElementById("boardSizeSelect");
+//   const boardWinSelect = document.getElementById("boardWinSelect");
 
-  let boardSize = parseInt(boardSizeSelect.value);
-  let boardWin = parseInt(boardWinSelect.value);
+//   let boardSize = parseInt(boardSizeSelect.value);
+//   let boardWin = parseInt(boardWinSelect.value);
 
-  boardSizeSelect.addEventListener("change", function () {
-    const selectedBoardSize = parseInt(boardSizeSelect.value);
-    boardSize = selectedBoardSize;
-    socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
-    resetGame();
-  });
+//   boardSizeSelect.addEventListener("change", function () {
+//     const selectedBoardSize = parseInt(boardSizeSelect.value);
+//     boardSize = selectedBoardSize;
+//     socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
+//     resetGame();
+//   });
 
-  boardWinSelect.addEventListener("change", function () {
-    const selectedWinSize = parseInt(boardWinSelect.value);
-    boardWin = selectedWinSize;
-    socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
-    resetGame();
-  });
+//   boardWinSelect.addEventListener("change", function () {
+//     const selectedWinSize = parseInt(boardWinSelect.value);
+//     boardWin = selectedWinSize;
+//     socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
+//     resetGame();
+//   });
+// });
+
+// Event listener for board size select
+boardSizeSelect.addEventListener("change", function () {
+  const selectedBoardSize = parseInt(boardSizeSelect.value);
+  boardSize = selectedBoardSize;
+  boardWin = parseInt(boardWinSelect.value); // Update boardWin as well
+  socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
+  resetGame();
 });
+
+// Event listener for board win select
+boardWinSelect.addEventListener("change", function () {
+  const selectedWinSize = parseInt(boardWinSelect.value);
+  boardWin = selectedWinSize;
+  socket.emit("boardSettingsChanged", { room, boardSize, boardWin });
+  resetGame();
+});
+
 
 socket.on("boardSettingsUpdated", ({ newBoardSize, newBoardWin }) => {
   boardSize = newBoardSize;
@@ -431,7 +476,7 @@ socket.on("gameReset", () => {
   currentPlayer = "X";
   updateBoard(board);
 
-  boardSize = 6;
+  boardSize = 3;
   boardWin = 3;
 
   boardSizeSelect.value = boardSize;
@@ -508,4 +553,5 @@ document.addEventListener("DOMContentLoaded", function () {
   updatePlayerNamesAndScores([]);
 });
 
-createBoard();
+//createBoard();
+createOrResetBoard();

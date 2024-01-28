@@ -15,8 +15,12 @@ export function playSound(soundElement) {
   soundElement.play();
 }
 
+let shouldRefresh = true; 
+
 export function refreshPageWithDelay() {
-  setTimeout(function () {
-    location.reload();
-  }, 5000); 
+  if (shouldRefresh) {
+    setTimeout(function () {
+      location.reload();
+    }, 5000);
+  }
 }

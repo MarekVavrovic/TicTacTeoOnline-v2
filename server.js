@@ -2,9 +2,6 @@ const path = require("path");
 const http = require("http");
 const express = require("express");
 const socketIO = require("socket.io");
-const helmet = require("helmet");
-const cors = require("cors");
-const xss = require("xss-clean");
 
 const formatMessage = require("./public/utils/messages");
 const {
@@ -18,15 +15,6 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
-//security
-app.use(helmet());
-const corsOptions = {
-  origin: "https://tic-tac-toe-mv.onrender.com",
-  methods: ["GET", "POST"],
-};
-app.use(cors(corsOptions));
-app.use(xss());
-
 app.use(express.static(path.join(__dirname, "public")));
 
 const games = {};
@@ -36,7 +24,7 @@ function createGameState(room, boardSize, boardWin) {
     board: Array(boardSize)
       .fill(null)
       .map(() => Array(boardSize).fill(null)),
-    currentPlayer: null, // Set the current player to null initially
+    currentPlayer: null, 
     boardSize: boardSize,
     boardWin: boardWin,
     winner: null,
@@ -132,7 +120,6 @@ function resetGameState(room) {
 const chatBot = "ChatBot ";
 
 io.on("connection", (socket) => {
-
   socket.on("joinRoom", ({ username, room, boardSize, boardWin }) => {
     const roomUsers = getRoomUsers(room);
 
@@ -166,7 +153,6 @@ io.on("connection", (socket) => {
           formatMessage(chatBot, `${user.username} has join the chat.`)
         );
 
-
       socket.on("chatMessage", (received) => {
         const user = getCurrentUser(socket.id);
         io.to(user.room).emit(
@@ -197,7 +183,7 @@ io.on("connection", (socket) => {
         io.to(user.room).emit("playerOrderChanged", gameState.currentPlayer);
       });
 
-      //handling win & board size 
+      //handling win & board size
       socket.on("boardSettingsChanged", ({ room, boardSize, boardWin }) => {
         const gameState = getGameState(room);
         gameState.boardSize = boardSize;
@@ -212,7 +198,7 @@ io.on("connection", (socket) => {
           newBoardSize: boardSize,
           newBoardWin: boardWin,
         });
-       
+
         socket.broadcast
           .to(user.room)
           .emit(
@@ -291,7 +277,7 @@ io.on("connection", (socket) => {
     const user = userLeftChat(socket.id);
     if (user) {
       io.to(user.room).emit("playerLeft", user.username);
-      
+
       io.to(user.room).emit(
         "message",
         formatMessage(
@@ -311,7 +297,6 @@ io.on("connection", (socket) => {
       io.to(user.room).emit("gameReset");
     }
   });
-
 });
 
 const PORT = 3000;

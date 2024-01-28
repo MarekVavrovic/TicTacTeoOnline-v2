@@ -148,7 +148,7 @@ swapPlayersButton.addEventListener("click", () => {
 socket.on("playerOrderChanged", (currentPlayer) => {
   currentPlayer = currentPlayer;
 
-  //update the UI to display the current player
+  //update the UI to display the current player (message)
 });
 
 let board = new Array(boardSize)
@@ -203,7 +203,7 @@ socket.on("gameStateUpdate", (gameState) => {
     if (gameState.winner) {
       displayWinner(gameState.winner === "X" ? playerXName : playerOName);
     } else {
-      // Handle draw scenario
+      // Draw scenario
       const probabilityText = calculateWinProbability(
         playerXScore,
         playerOScore
@@ -356,7 +356,7 @@ function calculateWinProbability(playerXScore, playerOScore) {
   };
 }
 
-// Socket.io code to handle the "playerLeft" event
+// handle the "playerLeft" event
 socket.on("playerLeft", (leftPlayerName) => {
   if (leftPlayerName === playerXName) {
     playerXNameInput.value = "Waiting for player X";

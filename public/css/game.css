@@ -11,12 +11,17 @@
 html,
 body {
   background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.9)),
-    url("../assets/bcg.jpg");
+    url("../assets/bcg-3.jpg");
     font-family: "Inconsolata", Helvetica, sans-serif;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+    background-size: cover;
 }
 input,
 label {
   display: block;
+  
 }
 
 ul {
@@ -42,6 +47,7 @@ a {
   color: #238ec8;
   font-size: 15px;
 }
+
 .container {
   --s: 10px; /* control the size */
   padding: var(--s);
@@ -51,12 +57,13 @@ a {
   background-image: linear-gradient(131.83deg, #7fa0b5 0%, #d3e6f5 99.21%);
   border-radius: 16px;
   box-shadow: rgba(13, 110, 180, 0.76) 0px 42px 70px 4px;
+  opacity: 0.7;
 }
 
 .board {
   display: grid;
   grid-gap: 1px;
-
+  
 }
 
 .cell {
@@ -69,6 +76,7 @@ a {
   border: 1px solid #111213;
   cursor: pointer;
   font-family: "Black Ops One", cursive;
+  
 }
 
 /* Define colors for players */
@@ -81,9 +89,8 @@ a {
 }
 
 
-
 .dropdownContainer {
-  opacity: 0; /* Start with opacity set to 0 */
+  opacity: 0; 
   color: #238ec8;
   font-family: "Black Ops One", cursive;
   text-align: center;
@@ -91,11 +98,12 @@ a {
   border: calc(2 * var(--s)) solid #0000;
   outline-offset: calc(-1 * var(--s));
   display: flex;
-  transition: opacity 1s; /* Add a transition for opacity */
+  transition: opacity 1s;
+  margin-top: -8rem;
 }
 
 .animate-opacity {
-  opacity: 1; /* When adding the class, set opacity to 1 */
+  opacity: 1; 
 }
 
 @keyframes opacityAnimation {
@@ -118,6 +126,7 @@ a {
   text-indent: 0.01px;
   text-overflow: "  ";
   outline: 0;
+
 }
 
 .dropdown-2 #boardWinSelect {
@@ -132,11 +141,10 @@ a {
   text-indent: 0.01px;
   text-overflow: "  ";
   outline: 0;
+
 }
 .dropdownLabel {
-  color: #244e60;
-  /* color:#238ec8; */
-  
+  color: #244e60;  
 }
 
 /* Modal*/
@@ -149,10 +157,28 @@ a {
 }
 
 #modalText {
-  font-size: 12px;
-   
-    text-wrap: wrap;
+  font-size: 12px;   
+  text-wrap: wrap;
+  
 }
+
+.winner-card h2{
+animation: focus-in-contract 1s linear 0s 1 normal none;
+}
+
+@keyframes focus-in-contract {
+			
+		0% {
+			letter-spacing:1em;
+			filter:blur(12px);
+			opacity:0;
+		}
+		100% {
+			filter:blur(0);
+			opacity:1;
+		}
+	}
+
 .modal {
   position: fixed;
   top: 0;
@@ -246,6 +272,10 @@ a {
   z-index: 10; 
 }
 
+.sidebar label{
+  color:#1f79aa ;
+}
+
 #leave-btn{
  text-align: center;
 }
@@ -253,7 +283,7 @@ a {
   width: 145px;
   padding: 5px 5px;
   margin-top: 20px;
-  background-color: #e74c3c; 
+  background-color: #1f79aa; 
   color: #fff; 
   font-family: "Black Ops One", cursive;
   font-size: 16px;
@@ -265,7 +295,10 @@ a {
 }
 
 .btn-reset:hover {
-  background-color: #c0392b; 
+  background-color: #238ec8; 
+  box-shadow: rgba(0, 0, 0, 0.09) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px,
+    rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px,
+    rgba(0, 0, 0, 0.09) 0px 32px 16px;
 }
 
 /*close sidebar button*/
@@ -313,9 +346,11 @@ a {
 }
 
 .sidebar {
-  background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.7)),
+  /* background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.7)),
     url("../assets/sidebar-bcg.png");
-  background-color: #238ec8;
+  background-color: #238ec8; */
+  background: url("../assets/sidebar-bcg-2.jpg");
+  /* background-size: cover; */
 }
 .sidebar h2 {
   font-family: "Black Ops One", cursive;

@@ -103,6 +103,7 @@ a {
   height: auto;
   border: 1px solid #ccc;
   overflow: hidden;
+ 
 } 
 
 .chat-box-body:after {
@@ -157,8 +158,7 @@ a {
   border: 1px solid #ccc;
   color: #888;
   border-top: none;
-  border-bottom-right-radius: 5px;
-  border-bottom-left-radius: 5px;
+   border-radius: 0;
   overflow: hidden;
 }
 

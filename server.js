@@ -166,7 +166,7 @@ io.on("connection", (socket) => {
           formatMessage(chatBot, `${user.username} has join the chat.`)
         );
 
-      //chat inputs
+
       socket.on("chatMessage", (received) => {
         const user = getCurrentUser(socket.id);
         io.to(user.room).emit(
@@ -197,7 +197,7 @@ io.on("connection", (socket) => {
         io.to(user.room).emit("playerOrderChanged", gameState.currentPlayer);
       });
 
-      //handling win & board size is changed
+      //handling win & board size 
       socket.on("boardSettingsChanged", ({ room, boardSize, boardWin }) => {
         const gameState = getGameState(room);
         gameState.boardSize = boardSize;
@@ -212,7 +212,7 @@ io.on("connection", (socket) => {
           newBoardSize: boardSize,
           newBoardWin: boardWin,
         });
-        /** */
+       
         socket.broadcast
           .to(user.room)
           .emit(
@@ -259,7 +259,6 @@ io.on("connection", (socket) => {
         const gameState = getGameState(room);
         io.to(room).emit("gameStateUpdate", gameState);
 
-        // Determine the next current player based on the number of moves made
         const xMoves = gameState.board
           .flat()
           .filter((cell) => cell === "X").length;
@@ -268,7 +267,6 @@ io.on("connection", (socket) => {
           .filter((cell) => cell === "O").length;
         const newCurrentPlayer = xMoves <= oMoves ? "X" : "O";
 
-        // Emit the new current player order to all clients
         io.to(room).emit("playerOrderChanged", newCurrentPlayer);
       });
 
@@ -302,7 +300,6 @@ io.on("connection", (socket) => {
         )
       );
 
-      // Reset the game state for the room
       resetGameState(user.room);
 
       // Remove the player from the sidebar
@@ -311,7 +308,6 @@ io.on("connection", (socket) => {
         users: getRoomUsers(user.room),
       });
 
-      // Emit a message to let clients know the game has been reset
       io.to(user.room).emit("gameReset");
     }
   });

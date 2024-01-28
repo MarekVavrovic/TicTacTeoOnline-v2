@@ -14,7 +14,7 @@
     <meta name="keywords" content="tic tac toe game, piškvorky" />
 
     <title>Never Give UP</title>
-  
+
     <link rel="stylesheet" href="/css/normalize.css" />
     <link rel="stylesheet" href="/css/game.css" />
     <link rel="stylesheet" href="./css/chat.css" />
@@ -32,7 +32,6 @@
   </head>
   <body>
     <main class="main">
-      
       <div>
         <span id="menuButton"
           ><button id="toggleSidebar" class="menu">
@@ -52,10 +51,10 @@
             >Board Size:
           </label>
           <select id="boardSizeSelect">
-            <option value="3"selected>3x3</option>
+            <option value="3" selected>3x3</option>
             <option value="4">4x4</option>
             <option value="5">5x5</option>
-            <option value="6" >6x6</option>
+            <option value="6">6x6</option>
             <option value="7">7x7</option>
             <option value="8">8x8</option>
             <option value="9">9x9</option>
@@ -87,24 +86,34 @@
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
       <span class="close-button-sidebar" id="toggleSidebar-2"
-        ><i class="fa-solid fa-xmark"></i></span>
+        ><i class="fa-solid fa-xmark"></i
+      ></span>
       <label for="room">Room</label>
       <input type="text" id="room" disabled />
       <label for="playerXName">Player X:</label>
-      <input type="text" id="playerXName" placeholder="Waiting for a player X" disabled/>
+      <input
+        type="text"
+        id="playerXName"
+        placeholder="Waiting for a player X"
+        disabled
+      />
       <label for="playerOName">Player O:</label>
-      <input type="text" id="playerOName" placeholder="Waiting for a player O" disabled/>
+      <input
+        type="text"
+        id="playerOName"
+        placeholder="Waiting for a player O"
+        disabled
+      />
       <button id="swapPlayers" class="btn-reset">Swap Players</button>
       <button id="resetScoreButton" class="btn-reset">Reset Score</button>
-      <button id="clearBoard" class="btn-reset">Clear Board</button>      
+      <button id="clearBoard" class="btn-reset">Clear Board</button>
       <a id="leave-btn" href="index.html" class="btn-reset">Leave Room</a>
-      
     </aside>
 
     <!-- CHATBOT -->
     <!-- chat reference start-->
-    
-       <div id="chat-circle" class="btn-cirlce">
+
+    <div id="chat-circle" class="btn-cirlce">
       <div id="chat-overlay"></div>
 
       <span class="material-symbols-outlined edit_square"> edit_square </span>
@@ -125,12 +134,7 @@
       </div>
       <div class="chat-input">
         <form id="chat-form">
-          <input
-            type="text"
-            id="msg"
-            autocomplete="off"
-            required
-          />
+          <input type="text" id="msg" autocomplete="off" required />
           <button type="submit" class="chat-submit" id="chat-submit">
             <i class="material-symbols-outlined">send</i>
           </button>
@@ -143,7 +147,8 @@
     <div id="myModal" class="modal">
       <div class="modal-content">
         <span class="close-button" id="closeModal"
-          ><i class="fa-solid fa-xmark"></i></span>
+          ><i class="fa-solid fa-xmark"></i
+        ></span>
         <p id="modalText"></p>
       </div>
     </div>
@@ -163,7 +168,7 @@
       <source src="./assets/sidebar.mp3" type="audio/mpeg" />
       Your browser does not support the audio element.
     </audio>
-   
+
     <script src="/socket.io/socket.io.js"></script>
     <script type="module" src="./js/game.js"></script>
   </body>
